@@ -1,0 +1,32 @@
+[
+  {
+    "id": "work-1",
+    "title": "공명 (Resonance)",
+    "artist": "김서연",
+    "major": "미디어아트전공",
+    "year": "2026",
+    "category": "미디어아트",
+    "runtime": "04:32",
+    "spec": "4K UHD / Stereo Soundscape",
+    "medium": "3D Generative Motion, Soundscape",
+    "statement": "보이지 않는 파동과 디지털 공간 속에서의 기억의 잔상을 시각화한 작품입니다. 실시간 생성형 알고리즘을 통해 관객과 공간, 그리고 소리가 상호작용하며 형성하는 유기적인 형태의 공명을 탐구합니다.",
+    "thumbnail": "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=800&q=80",
+    "src": "videos/01_Resonance_KimSeoyeon.mp4",
+    "type": "video/mp4"
+  },
+  {
+    "id": "work-2",
+    "title": "유영하는 빛의 연대기",
+    "artist": "박준형",
+    "major": "영상디자인전공",
+    "year": "2026",
+    "category": "모션그래픽",
+    "runtime": "03:15",
+    "spec": "1080p FHD / Spatial Audio",
+    "medium": "Cinema 4D, Octane, After Effects",
+    "statement": "물질과 빛의 경계면에서 일어나는 빛의 굴절과 분산을 몽환적인 3차원 모션으로 재구성한 영상입니다.",
+    "thumbnail": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80",
+    "src": "videos/02_LightChronicles_Park.mp4",
+    "type": "video/mp4"
+  }
+]
