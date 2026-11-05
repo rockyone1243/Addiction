@@ -6,6 +6,8 @@
   <title>2026 졸업작품 영상 상시 상영관 | GRADUATION EXHIBITION</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <!-- QRCode.js CDN for Scannable Exhibition Placards -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -52,7 +54,6 @@
       background: #434352;
     }
 
-    /* Video player range inputs styling */
     input[type=range] {
       accent-color: #818cf8;
     }
@@ -64,6 +65,28 @@
     .kiosk-idle .kiosk-ui {
       opacity: 0;
       pointer-events: none;
+    }
+
+    /* Print Placard Styles */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #printablePlacardArea, #printablePlacardArea * {
+        visibility: visible;
+      }
+      #printablePlacardArea {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: white !important;
+        color: black !important;
+        padding: 40px;
+        box-shadow: none !important;
+        border: none !important;
+      }
     }
   </style>
 </head>
@@ -83,27 +106,37 @@
         </div>
         <div>
           <div class="flex items-center space-x-2">
-            <h1 id="headerExhibitionTitle" class="text-sm sm:text-base font-bold tracking-tight text-white uppercase">2026 졸업작품 영상 상시 상영관</h1>
+            <h1 id="headerExhibitionTitle" class="text-sm sm:text-base font-bold tracking-tight text-white uppercase">Overdose | 졸업영상 상영관</h1>
             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-950 text-emerald-400 border border-emerald-800/60 animate-pulse">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5"></span>LIVE ARCHIVE
             </span>
           </div>
-          <p id="headerDeptTitle" class="text-xs text-gallery-300 hidden sm:block">미디어디자인 / 영상애니메이션 / 디지털아트 졸업전시</p>
+          <p id="headerDeptTitle" class="text-xs text-gallery-300 hidden sm:block">미디어아트 / 디지털영상 (Artist: rockyone1243)</p>
         </div>
       </div>
 
       <!-- Right Action Tools -->
       <div class="flex items-center space-x-2 sm:space-x-3">
-        <!-- Add Video / Sync Button -->
-        <button id="btnOpenUploadModal" class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-gallery-850 hover:bg-gallery-800 text-xs font-medium border border-gallery-700 transition shadow-sm text-gallery-100">
+        
+        <!-- QR Code & Placard Print Button (Key Requested Feature!) -->
+        <button id="btnOpenQrModal" class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-gallery-850 hover:bg-gallery-800 text-xs font-medium border border-gallery-700 transition shadow-sm text-gallery-100">
           <svg class="w-4 h-4 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
           </svg>
-          <span class="hidden md:inline">영상 등록 / GitHub 연동</span>
-          <span class="md:hidden">등록/연동</span>
+          <span class="hidden md:inline">전시 QR코드 & 명제표 인쇄</span>
+          <span class="md:hidden">QR/명제표</span>
         </button>
 
-        <!-- GitHub Fast Sync Button -->
+        <!-- Video Upload & CMS Button -->
+        <button id="btnOpenUploadModal" class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-gallery-850 hover:bg-gallery-800 text-xs font-medium border border-gallery-700 transition shadow-sm text-gallery-100">
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span class="hidden md:inline">영상 등록 / 업로드 관리</span>
+          <span class="md:hidden">영상 추가</span>
+        </button>
+
+        <!-- Fast GitHub Sync Button -->
         <button id="btnQuickSync" title="GitHub 저장소 영상 목록 동기화" class="p-2 rounded-lg bg-gallery-850 hover:bg-gallery-800 text-gallery-300 hover:text-white border border-gallery-700 transition">
           <svg id="syncIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -152,7 +185,7 @@
       <div class="lg:col-span-8 space-y-4">
         
         <!-- Video Screen Container -->
-        <div class="relative bg-black rounded-2xl overflow-hidden border border-gallery-800 shadow-2xl aspect-video group">
+        <div id="videoContainer" class="relative bg-black rounded-2xl overflow-hidden border border-gallery-800 shadow-2xl aspect-video group">
           
           <!-- Native Video Tag -->
           <video id="mainVideoPlayer" class="w-full h-full object-contain bg-black" playsinline preload="auto">
@@ -161,6 +194,31 @@
 
           <!-- Iframe for YouTube / Vimeo Embed Support -->
           <iframe id="embedPlayer" class="w-full h-full border-0 hidden" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+          <!-- Standby Overlay (Shown if video source is not yet loaded/local) -->
+          <div id="standbyOverlay" class="absolute inset-0 bg-gallery-950/80 backdrop-blur-sm flex flex-col items-center justify-center text-center p-6 space-y-4 hidden z-20">
+            <div class="w-16 h-16 rounded-2xl bg-accent-500/10 border border-accent-500/30 flex items-center justify-center text-accent-400 shadow-xl">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div class="space-y-1">
+              <h3 class="text-base font-bold text-white">전시 영상 재생 준비 완료</h3>
+              <p class="text-xs text-gallery-300 max-w-md">
+                현재 출품작 영상을 재생하거나, 컴퓨터에 있는 영상 파일을 이곳으로 드래그하여 즉시 상영을 시작할 수 있습니다.
+              </p>
+            </div>
+            <div class="flex items-center space-x-3 pt-2">
+              <button id="btnStagePlayFile" class="px-4 py-2 rounded-xl bg-accent-500 hover:bg-accent-400 text-xs font-semibold text-white shadow-lg shadow-accent-500/20 transition flex items-center space-x-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /></svg>
+                <span>영상 파일 열기 / 재생</span>
+              </button>
+              <button id="btnStageOpenAddModal" class="px-4 py-2 rounded-xl bg-gallery-850 hover:bg-gallery-800 text-xs font-medium text-gallery-200 border border-gallery-700 transition">
+                새 영상 등록
+              </button>
+            </div>
+          </div>
 
           <!-- Video Curtain Transition Overlay -->
           <div id="videoCurtain" class="absolute inset-0 bg-black opacity-0 pointer-events-none transition-opacity duration-500 z-10"></div>
@@ -180,7 +238,7 @@
               미디어아트
             </span>
             <span id="badgeResolution" class="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-white/10 backdrop-blur-md text-white/80 border border-white/10">
-              FHD 1080p
+              4K MASTER
             </span>
           </div>
 
@@ -272,7 +330,7 @@
             <kbd class="px-1.5 py-0.5 bg-gallery-800 rounded text-[10px] text-gallery-100 font-mono">Space</kbd> 재생/정지
             <kbd class="px-1.5 py-0.5 bg-gallery-800 rounded text-[10px] text-gallery-100 font-mono">F</kbd> 전체화면
             <kbd class="px-1.5 py-0.5 bg-gallery-800 rounded text-[10px] text-gallery-100 font-mono">M</kbd> 음소거
-            <kbd class="px-1.5 py-0.5 bg-gallery-800 rounded text-[10px] text-gallery-100 font-mono">N</kbd> 다음작품
+            <kbd class="px-1.5 py-0.5 bg-gallery-800 rounded text-[10px] text-gallery-100 font-mono">L</kbd> 무한반복
           </div>
           <div class="text-[11px] text-gallery-300">
             상시 상영 루프: <span id="loopStatusText" class="text-accent-300 font-medium">전체 순환 자동 재생 중</span>
@@ -291,28 +349,28 @@
             <span id="detailYearBadge" class="text-xs font-mono text-gallery-300">2026 GRADUATION</span>
           </div>
           <h2 id="detailTitle" class="text-2xl font-extrabold text-white tracking-tight leading-snug">
-            공명 (Resonance)
+            2차 심사용 작품
           </h2>
           <div class="flex items-baseline space-x-2 text-sm text-gallery-300">
-            <span id="detailArtist" class="font-semibold text-gallery-100">김서연</span>
+            <span id="detailArtist" class="font-semibold text-gallery-100">출품 작가</span>
             <span>·</span>
-            <span id="detailMajor">미디어아트전공</span>
+            <span id="detailMajor">미디어아트 / 디지털영상</span>
           </div>
         </div>
 
-        <!-- Artwork Specs Specs Grid -->
+        <!-- Artwork Specs Grid -->
         <div class="grid grid-cols-2 gap-3 text-xs">
           <div class="bg-gallery-850 p-3 rounded-xl border border-gallery-800">
             <span class="block text-gallery-300 text-[10px] uppercase font-mono">매체 / Medium</span>
-            <span id="detailMedium" class="font-medium text-gallery-100 mt-0.5 block">3D Generative Motion</span>
+            <span id="detailMedium" class="font-medium text-gallery-100 mt-0.5 block">Single Channel Video, Glitch</span>
           </div>
           <div class="bg-gallery-850 p-3 rounded-xl border border-gallery-800">
             <span class="block text-gallery-300 text-[10px] uppercase font-mono">상영 시간 / Runtime</span>
-            <span id="detailRuntime" class="font-medium text-gallery-100 mt-0.5 block">04:32</span>
+            <span id="detailRuntime" class="font-medium text-gallery-100 mt-0.5 block">00:59</span>
           </div>
           <div class="bg-gallery-850 p-3 rounded-xl border border-gallery-800 col-span-2">
             <span class="block text-gallery-300 text-[10px] uppercase font-mono">해상도 & 음향 / Spec</span>
-            <span id="detailSpec" class="font-medium text-gallery-100 mt-0.5 block">4K UHD / Stereo Soundscape</span>
+            <span id="detailSpec" class="font-medium text-gallery-100 mt-0.5 block">4K UHD Master / Stereo Sound</span>
           </div>
         </div>
 
@@ -322,7 +380,7 @@
             <span>작가 노트 / Artist Statement</span>
           </h3>
           <p id="detailStatement" class="text-xs sm:text-sm text-gallery-300 leading-relaxed max-h-48 overflow-y-auto pr-1">
-            보이지 않는 파동과 디지털 공간 속에서의 기억의 잔상을 시각화한 작품입니다. 실시간 생성형 알고리즘을 통해 관객과 공간, 그리고 소리가 상호작용하며 형성하는 유기적인 형태의 공명을 탐구합니다.
+            미디어 과포화와 디지털 시각 매체의 범람 속에서 파편화되는 현대인의 감각과 기억을 다채널 모니터의 결함(Glitch)과 노이즈, 통신 두절(NO SIGNAL) 화면의 교차를 통해 표현한 영상 미디어아트 작품입니다.
           </p>
         </div>
 
@@ -335,11 +393,9 @@
             <span>작품 링크 복사</span>
           </button>
           
-          <button id="btnTriggerNext" class="py-2 px-4 rounded-xl bg-accent-500 hover:bg-accent-400 text-xs font-semibold text-white transition flex items-center space-x-1 shadow-lg shadow-accent-500/20">
-            <span>다음</span>
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
+          <button id="btnOpenQrFromPlacard" class="py-2 px-4 rounded-xl bg-accent-500 hover:bg-accent-400 text-xs font-semibold text-white transition flex items-center space-x-1 shadow-lg shadow-accent-500/20">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+            <span>QR 명제표</span>
           </button>
         </div>
 
@@ -347,19 +403,19 @@
 
     </div>
 
-    <!-- SECTION 2: EXHIBITION PLAYLIST ARCHIVE (작품 아카이브 및 큐레이션 목록) -->
+    <!-- SECTION 2: EXHIBITION PLAYLIST ARCHIVE (등록된 출품 영상 목록) -->
     <section class="space-y-6 pt-4">
       
       <!-- Section Header with Search and Category Filters -->
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gallery-800 pb-5">
         <div>
           <h3 class="text-xl font-bold text-white tracking-tight flex items-center space-x-2">
-            <span>전시 상영 목록 (Exhibition Program)</span>
+            <span>출품작 상영 목록 (Exhibition Program)</span>
             <span id="playlistCountBadge" class="text-xs px-2 py-0.5 rounded-full bg-accent-500/20 text-accent-300 font-mono border border-accent-500/30">
-              4 작품
+              1 작품
             </span>
           </h3>
-          <p class="text-xs text-gallery-300 mt-1">졸업전시 참여 학생들의 출품작 전체 아카이브입니다. 원하는 작품을 클릭하면 즉시 상영됩니다.</p>
+          <p class="text-xs text-gallery-300 mt-1">내가 업로드한 영상 및 추가 등록된 작품 목록입니다. 클릭하면 즉시 상영됩니다.</p>
         </div>
 
         <!-- Search & Category Filters -->
@@ -372,24 +428,11 @@
             </svg>
           </div>
 
-          <!-- Category Filter Buttons -->
-          <div class="flex items-center space-x-1 bg-gallery-900 p-1 rounded-lg border border-gallery-800">
-            <button data-cat="all" class="cat-pill px-2.5 py-1 rounded-md text-xs font-medium bg-accent-500 text-white transition">
-              전체
-            </button>
-            <button data-cat="미디어아트" class="cat-pill px-2.5 py-1 rounded-md text-xs font-medium text-gallery-300 hover:text-white transition">
-              미디어아트
-            </button>
-            <button data-cat="애니메이션" class="cat-pill px-2.5 py-1 rounded-md text-xs font-medium text-gallery-300 hover:text-white transition">
-              애니메이션
-            </button>
-            <button data-cat="단편영화" class="cat-pill px-2.5 py-1 rounded-md text-xs font-medium text-gallery-300 hover:text-white transition">
-              단편영화
-            </button>
-            <button data-cat="모션그래픽" class="cat-pill px-2.5 py-1 rounded-md text-xs font-medium text-gallery-300 hover:text-white transition">
-              모션그래픽
-            </button>
-          </div>
+          <!-- Add video trigger -->
+          <button id="btnQuickAddTrigger" class="px-3 py-1.5 rounded-lg bg-accent-500/10 hover:bg-accent-500/20 text-accent-300 border border-accent-500/30 text-xs font-medium flex items-center space-x-1 transition">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            <span>+ 새 영상 추가</span>
+          </button>
         </div>
       </div>
 
@@ -403,33 +446,31 @@
         <svg class="w-12 h-12 text-gallery-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
         </svg>
-        <p class="text-sm font-medium text-gallery-100">조건에 맞는 전시 영상이 없습니다.</p>
-        <p class="text-xs text-gallery-300 mt-1">검색어를 지우거나 상단 [영상 등록 / GitHub 연동] 버튼을 눌러 새 영상을 추가해보세요.</p>
+        <p class="text-sm font-medium text-gallery-100">등록된 전시 영상이 없습니다.</p>
+        <p class="text-xs text-gallery-300 mt-1">상단 [+ 새 영상 추가] 버튼을 눌러 나중에 완성되는 영상을 등록해보세요.</p>
       </div>
 
     </section>
 
-    <!-- SECTION 3: EXHIBITION HOSTING / GITHUB PAGES GUIDE EMBEDDED -->
+    <!-- SECTION 3: CONTINUOUS UPLOAD & QR CODE PRINT CARD -->
     <section class="bg-gradient-to-br from-gallery-900 to-gallery-850 rounded-2xl border border-gallery-800 p-6 sm:p-8 space-y-6">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-accent-500/10 text-accent-300 border border-accent-500/20 mb-2">
-            🚀 깃허브 상시 구동 및 영상 업로드 즉시 재생 가이드
+            🚀 지속적 영상 업로드 & 전시 캡션 QR코드 시스템
           </span>
-          <h3 class="text-lg sm:text-xl font-bold text-white">GitHub Pages로 365일 무료 무중단 상영하기</h3>
+          <h3 class="text-lg sm:text-xl font-bold text-white">영상이 완성될 때마다 바로 추가하는 3가지 방법</h3>
           <p class="text-xs sm:text-sm text-gallery-300 mt-1">
-            이 웹사이트는 정적 호스팅(GitHub Pages)에 최적화되어 있어, 서버 비용 0원으로 전시장에 상시 띄워둘 수 있습니다.
+            코딩 없이 영상을 즉시 추가하고, 관람객이 스마트폰으로 스캔할 수 있는 규격 명제표 QR코드를 바로 생성·인쇄하세요.
           </p>
         </div>
         <div class="flex items-center space-x-2">
-          <button id="btnCopyJsonTemplate" class="px-3 py-2 rounded-xl bg-gallery-800 hover:bg-gallery-700 text-xs font-medium text-gallery-100 border border-gallery-700 transition flex items-center space-x-1.5">
-            <svg class="w-4 h-4 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-            </svg>
-            <span>videos.json 템플릿 복사</span>
+          <button id="btnBannerOpenQr" class="px-3.5 py-2 rounded-xl bg-accent-500 hover:bg-accent-400 text-xs font-semibold text-white transition flex items-center space-x-1.5 shadow-lg shadow-accent-500/20">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+            <span>QR 명제표 인쇄하기</span>
           </button>
-          <button id="btnViewFullGuide" class="px-3.5 py-2 rounded-xl bg-accent-500 hover:bg-accent-400 text-xs font-semibold text-white transition">
-            전체 매뉴얼 보기
+          <button id="btnBannerOpenCms" class="px-3 py-2 rounded-xl bg-gallery-800 hover:bg-gallery-700 text-xs font-medium text-gallery-100 border border-gallery-700 transition">
+            영상 업로드 대시보드
           </button>
         </div>
       </div>
@@ -437,23 +478,23 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
         <div class="bg-gallery-950/60 p-4 rounded-xl border border-gallery-800/80 space-y-2">
           <div class="w-7 h-7 rounded-lg bg-accent-500/20 text-accent-300 flex items-center justify-center font-bold text-xs">1</div>
-          <h4 class="font-bold text-gallery-100 text-sm">저장소에 videos/ 폴더 생성</h4>
+          <h4 class="font-bold text-gallery-100 text-sm">GitHub videos/ 폴더 업로드</h4>
           <p class="text-gallery-300 leading-relaxed">
-            GitHub Repository의 <code class="text-accent-300 bg-gallery-900 px-1 py-0.5 rounded">videos/</code> 폴더에 학생들의 <code class="text-accent-300 bg-gallery-900 px-1 py-0.5 rounded">.mp4</code> 영상 파일을 업로드합니다.
+            새 영상이 완성되면 저장소의 <code class="text-accent-300 bg-gallery-900 px-1 py-0.5 rounded">videos/</code> 폴더에 파일만 올리세요. 사이트가 깃허브 API로 자동 감지하여 즉시 재생 목록에 반영합니다.
           </p>
         </div>
         <div class="bg-gallery-950/60 p-4 rounded-xl border border-gallery-800/80 space-y-2">
           <div class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-300 flex items-center justify-center font-bold text-xs">2</div>
-          <h4 class="font-bold text-gallery-100 text-sm">GitHub API 실시간 감지</h4>
+          <h4 class="font-bold text-gallery-100 text-sm">웹 UI로 직접 등록 (CMS)</h4>
           <p class="text-gallery-300 leading-relaxed">
-            상단 설정창에서 저장소 주소(User/Repo)만 입력해두면, 사이트가 깃허브 API를 통해 새 영상이 올라오자마자 자동으로 목록을 갱신합니다.
+            상단 [영상 등록] 메뉴에서 제목, 작가명, 유튜브/비메오 링크를 입력하고 등록하면 즉시 사이트에 추가되며, 최신 <code class="text-accent-300 bg-gallery-900 px-1 py-0.5 rounded">videos.json</code> 파일을 원클릭으로 내보낼 수 있습니다.
           </p>
         </div>
         <div class="bg-gallery-950/60 p-4 rounded-xl border border-gallery-800/80 space-y-2">
           <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-xs">3</div>
-          <h4 class="font-bold text-gallery-100 text-sm">전시관 키오스크 상시 루프</h4>
+          <h4 class="font-bold text-gallery-100 text-sm">전시대 부착용 QR 캡션 명제표</h4>
           <p class="text-gallery-300 leading-relaxed">
-            전시장 모니터나 빔프로젝터에서 <kbd class="bg-gallery-900 px-1.5 py-0.5 rounded text-white font-mono">F</kbd> 키를 누르면 캡션과 컨트롤이 자동으로 숨겨지며 24시간 무한 연속 상영됩니다.
+            상설 전시장 작품 옆 아크릴 거치대에 둘 수 있는 고해상도 QR코드와 캡션 명제표를 생성하여 바로 출력할 수 있습니다.
           </p>
         </div>
       </div>
@@ -472,7 +513,6 @@
   <!-- ================= KIOSK FULLSCREEN OVERLAY ================= -->
   <div id="kioskOverlay" class="fixed inset-0 bg-black z-50 hidden flex flex-col justify-between overflow-hidden select-none">
     
-    <!-- Video Player Mirror / Native In-Kiosk Player -->
     <div class="absolute inset-0 z-0 flex items-center justify-center bg-black">
       <video id="kioskVideoPlayer" class="w-full h-full object-contain" playsinline autoplay></video>
       <div id="kioskCurtain" class="absolute inset-0 bg-black opacity-0 pointer-events-none transition-opacity duration-700"></div>
@@ -505,11 +545,11 @@
       <div class="space-y-1.5 max-w-xl">
         <div class="flex items-center space-x-2">
           <span id="kioskCategoryBadge" class="text-xs font-semibold px-2 py-0.5 rounded bg-accent-500/80 text-white">미디어아트</span>
-          <span id="kioskRuntimeBadge" class="text-xs font-mono text-white/70">04:32</span>
+          <span id="kioskRuntimeBadge" class="text-xs font-mono text-white/70">00:59</span>
         </div>
-        <h3 id="kioskArtworkTitle" class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">공명 (Resonance)</h3>
+        <h3 id="kioskArtworkTitle" class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">2차 심사용 작품</h3>
         <p class="text-sm text-gallery-300">
-          <span id="kioskArtistName" class="font-medium text-white">김서연</span> · <span id="kioskMajor">미디어아트전공</span>
+          <span id="kioskArtistName" class="font-medium text-white">출품 작가</span> · <span id="kioskMajor">미디어아트 / 디지털영상</span>
         </p>
       </div>
 
@@ -534,17 +574,177 @@
 
   </div>
 
-  <!-- ================= MODAL: ADD VIDEO / GITHUB SYNC ================= -->
-  <div id="uploadModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+  <!-- ================= MODAL: QR CODE & EXHIBITION PLACARD GENERATOR ================= -->
+  <div id="qrModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
     <div class="bg-gallery-900 border border-gallery-800 rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
       
       <!-- Modal Header -->
       <div class="px-6 py-4 border-b border-gallery-800 flex items-center justify-between">
         <div class="flex items-center space-x-2">
           <svg class="w-5 h-5 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+          </svg>
+          <h3 class="text-base font-bold text-white">전시 QR 코드 및 명제표 생성기</h3>
+        </div>
+        <button id="btnCloseQrModal" class="text-gallery-300 hover:text-white transition p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 overflow-y-auto space-y-6 flex-1 text-xs">
+        
+        <!-- 404 Error Warning & Instant Fix Tool -->
+        <div id="qr404WarningBanner" class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2 font-bold text-amber-300 text-xs sm:text-sm">
+              <svg class="w-4 h-4 text-amber-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+              <span>스마트폰 스캔 시 404 Not Found 에러 원인 & 즉시 해결</span>
+            </div>
+            <span id="qrStatusBadge" class="px-2 py-0.5 rounded text-[10px] font-semibold bg-red-950 text-red-300 border border-red-800">
+              ⚠️ 예시 주소(404 원인)
+            </span>
+          </div>
+          <p class="text-[11px] text-amber-200/90 leading-relaxed">
+            스마트폰에서 404 에러가 뜨는 이유는 QR 코드에 예시 단어(<code class="text-white font-mono bg-amber-950/60 px-1 py-0.5 rounded">your-username</code>)가 포함되어 있기 때문입니다. 아래 칸에 <strong>본인의 실제 GitHub 아이디</strong>를 입력하시면 유효한 정상 접속 QR 코드로 즉시 자동 갱신됩니다!
+          </p>
+        </div>
+
+        <!-- Interactive GitHub URL Builder -->
+        <div class="p-4 bg-gallery-850 rounded-xl border border-gallery-700 space-y-3">
+          <span class="block font-bold text-gallery-100 text-xs">내 깃허브 정보 입력 (원클릭 QR 생성 & 주소 검증)</span>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-gallery-300 text-[11px] mb-1 font-medium">내 GitHub 아이디 (Username) *</label>
+              <input id="qrGhUser" type="text" value="rockyone1243" class="w-full px-3 py-2 rounded-lg bg-gallery-900 border border-gallery-700 text-gallery-100 font-mono text-xs focus:outline-none focus:border-accent-500">
+            </div>
+            <div>
+              <label class="block text-gallery-300 text-[11px] mb-1 font-medium">저장소 이름 (Repository) *</label>
+              <input id="qrGhRepo" type="text" value="Overdose" class="w-full px-3 py-2 rounded-lg bg-gallery-900 border border-gallery-700 text-gallery-100 font-mono text-xs focus:outline-none focus:border-accent-500">
+            </div>
+          </div>
+
+          <!-- Generated Final Target URL -->
+          <div class="space-y-1">
+            <label class="block text-gallery-300 text-[11px] font-medium">스마트폰이 접속할 최종 URL</label>
+            <div class="flex flex-wrap sm:flex-nowrap gap-2">
+              <input id="qrTargetUrlInput" type="url" value="https://rockyone1243.github.io/Overdose/" class="flex-1 min-w-[200px] px-3 py-2 rounded-lg bg-gallery-900 border border-gallery-700 text-gallery-100 font-mono text-xs focus:outline-none focus:border-accent-500">
+              <button id="btnRegenerateQr" class="px-3.5 py-2 rounded-lg bg-accent-500 hover:bg-accent-400 text-white font-semibold transition shrink-0">
+                QR 갱신
+              </button>
+              <a id="btnTestQrUrl" href="https://rockyone1243.github.io/Overdose/" target="_blank" class="px-3 py-2 rounded-lg bg-gallery-800 hover:bg-gallery-700 text-gallery-200 border border-gallery-700 transition flex items-center space-x-1 shrink-0 text-center" title="브라우저 새 탭에서 열어 정상 접속 여부 확인">
+                <span>새 탭 테스트</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 404 Troubleshooting Guide Accordion -->
+        <div class="border border-gallery-800 rounded-xl overflow-hidden bg-gallery-950/40">
+          <button id="btnToggle404Guide" class="w-full px-4 py-3 flex items-center justify-between text-left text-xs font-semibold text-gallery-200 hover:text-white transition">
+            <span class="flex items-center space-x-2">
+              <span>🛠️ GitHub Pages 404 에러 필수 점검 4단계 (체크리스트)</span>
+            </span>
+            <svg id="arrow404Guide" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div id="content404Guide" class="hidden px-4 pb-4 pt-1 space-y-2 text-[11px] text-gallery-300 border-t border-gallery-800/60">
+            <div class="flex items-start space-x-2">
+              <span class="w-4 h-4 rounded-full bg-accent-500/20 text-accent-300 flex items-center justify-center shrink-0 font-bold mt-0.5">1</span>
+              <div>
+                <strong class="text-white">배포 소요 시간 (1~3분 대기)</strong>: GitHub Pages를 활성화한 직후에는 깃허브가 서버를 빌드 중이므로 1~3분간 404가 뜹니다. 저장소의 <strong>Actions</strong> 탭에서 작업이 완료(초록 체크)될 때까지 잠시 기다려주세요.
+              </div>
+            </div>
+            <div class="flex items-start space-x-2">
+              <span class="w-4 h-4 rounded-full bg-accent-500/20 text-accent-300 flex items-center justify-center shrink-0 font-bold mt-0.5">2</span>
+              <div>
+                <strong class="text-white">저장소 Public(공개) 설정 필수</strong>: 무료 GitHub 계정은 <strong>Public</strong> 저장소에서만 웹 호스팅을 지원합니다. Private 저장소는 404 에러가 뜹니다. (Settings → General 맨 밑 Danger Zone에서 Change to public)
+              </div>
+            </div>
+            <div class="flex items-start space-x-2">
+              <span class="w-4 h-4 rounded-full bg-accent-500/20 text-accent-300 flex items-center justify-center shrink-0 font-bold mt-0.5">3</span>
+              <div>
+                <strong class="text-white">Settings → Pages 브랜치 저장 확인</strong>: 저장소 <strong>Settings → Pages</strong>에서 Branch가 <strong>main</strong> 및 <strong>/(root)</strong>로 설정되어 있고 <strong>[Save]</strong> 버튼이 눌렸는지 확인하세요.
+              </div>
+            </div>
+            <div class="flex items-start space-x-2">
+              <span class="w-4 h-4 rounded-full bg-accent-500/20 text-accent-300 flex items-center justify-center shrink-0 font-bold mt-0.5">4</span>
+              <div>
+                <strong class="text-white">파일명 소문자 index.html & 404.html</strong>: 파일명이 대문자(<code>Index.html</code>)이거나 하위 폴더에 있으면 안 됩니다. 배포 패키지에 포함된 <code>404.html</code>을 함께 올려두면 주소 입력 실수 시에도 메인으로 자동 연결됩니다.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preview Placard (Ready to print for gallery acrylic stand) -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-gallery-100">전시 부스용 규격 캡션 명제표 미리보기</span>
+            <span class="text-[11px] text-gallery-300">인쇄 시 아래 카드가 실제 크기로 출력됩니다</span>
+          </div>
+
+          <!-- Printable Area -->
+          <div id="printablePlacardArea" class="bg-white text-zinc-900 p-6 rounded-xl border border-zinc-200 shadow-lg flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="space-y-2 flex-1">
+              <div class="border-b border-zinc-300 pb-2">
+                <span id="placardPrintExhibition" class="text-[10px] uppercase font-mono tracking-widest text-zinc-500 block">2026 GRADUATION EXHIBITION : OVERDOSE</span>
+                <h2 id="placardPrintTitle" class="text-xl font-extrabold text-zinc-950 mt-1">Overdose</h2>
+                <p class="text-xs text-zinc-700 mt-0.5">
+                  <span id="placardPrintArtist" class="font-bold text-zinc-900">rockyone1243</span> · <span id="placardPrintMajor">미디어아트 / 디지털영상</span>
+                </p>
+              </div>
+              <div class="text-[11px] text-zinc-600 space-y-1">
+                <div><span class="font-semibold text-zinc-800">재료/매체:</span> <span id="placardPrintMedium">Single Channel Video, Glitch</span></div>
+                <div><span class="font-semibold text-zinc-800">러닝타임:</span> <span id="placardPrintRuntime">00:59</span></div>
+              </div>
+              <p id="placardPrintStatement" class="text-[11px] text-zinc-600 leading-relaxed pt-1 line-clamp-3">
+                미디어 과포화와 디지털 시각 매체의 범람 속에서 파편화되는 현대인의 감각과 기억을 다채널 모니터의 결함(Glitch)과 노이즈를 통해 표현한 영상 미디어아트 작품입니다.
+              </p>
+            </div>
+
+            <!-- QR Code Canvas & Caption -->
+            <div class="flex flex-col items-center justify-center text-center p-3 bg-zinc-50 rounded-xl border border-zinc-200 w-44 shrink-0">
+              <div id="qrcodeCanvasContainer" class="w-32 h-32 flex items-center justify-center bg-white p-1 rounded-lg shadow-inner">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 450 450" width="450" height="450">
+<rect width="450" height="450" fill="#ffffff"/>
+<path fill="#111827" d="M40,40h10v10h-10z M50,40h10v10h-10z M60,40h10v10h-10z M70,40h10v10h-10z M80,40h10v10h-10z M90,40h10v10h-10z M100,40h10v10h-10z M120,40h10v10h-10z M150,40h10v10h-10z M170,40h10v10h-10z M180,40h10v10h-10z M190,40h10v10h-10z M200,40h10v10h-10z M230,40h10v10h-10z M240,40h10v10h-10z M290,40h10v10h-10z M300,40h10v10h-10z M340,40h10v10h-10z M350,40h10v10h-10z M360,40h10v10h-10z M370,40h10v10h-10z M380,40h10v10h-10z M390,40h10v10h-10z M400,40h10v10h-10z M40,50h10v10h-10z M100,50h10v10h-10z M120,50h10v10h-10z M130,50h10v10h-10z M140,50h10v10h-10z M160,50h10v10h-10z M170,50h10v10h-10z M250,50h10v10h-10z M260,50h10v10h-10z M310,50h10v10h-10z M340,50h10v10h-10z M400,50h10v10h-10z M40,60h10v10h-10z M60,60h10v10h-10z M70,60h10v10h-10z M80,60h10v10h-10z M100,60h10v10h-10z M120,60h10v10h-10z M140,60h10v10h-10z M150,60h10v10h-10z M170,60h10v10h-10z M180,60h10v10h-10z M200,60h10v10h-10z M210,60h10v10h-10z M220,60h10v10h-10z M230,60h10v10h-10z M250,60h10v10h-10z M280,60h10v10h-10z M300,60h10v10h-10z M340,60h10v10h-10z M360,60h10v10h-10z M370,60h10v10h-10z M380,60h10v10h-10z M400,60h10v10h-10z M40,70h10v10h-10z M60,70h10v10h-10z M70,70h10v10h-10z M80,70h10v10h-10z M100,70h10v10h-10z M160,70h10v10h-10z M170,70h10v10h-10z M180,70h10v10h-10z M190,70h10v10h-10z M200,70h10v10h-10z M230,70h10v10h-10z M240,70h10v10h-10z M280,70h10v10h-10z M290,70h10v10h-10z M300,70h10v10h-10z M310,70h10v10h-10z M340,70h10v10h-10z M360,70h10v10h-10z M370,70h10v10h-10z M380,70h10v10h-10z M400,70h10v10h-10z M40,80h10v10h-10z M60,80h10v10h-10z M70,80h10v10h-10z M80,80h10v10h-10z M100,80h10v10h-10z M170,80h10v10h-10z M180,80h10v10h-10z M190,80h10v10h-10z M220,80h10v10h-10z M240,80h10v10h-10z M260,80h10v10h-10z M270,80h10v10h-10z M280,80h10v10h-10z M290,80h10v10h-10z M340,80h10v10h-10z M360,80h10v10h-10z M370,80h10v10h-10z M380,80h10v10h-10z M400,80h10v10h-10z M40,90h10v10h-10z M100,90h10v10h-10z M120,90h10v10h-10z M130,90h10v10h-10z M140,90h10v10h-10z M150,90h10v10h-10z M160,90h10v10h-10z M170,90h10v10h-10z M190,90h10v10h-10z M220,90h10v10h-10z M230,90h10v10h-10z M260,90h10v10h-10z M270,90h10v10h-10z M290,90h10v10h-10z M300,90h10v10h-10z M310,90h10v10h-10z M320,90h10v10h-10z M340,90h10v10h-10z M400,90h10v10h-10z M40,100h10v10h-10z M50,100h10v10h-10z M60,100h10v10h-10z M70,100h10v10h-10z M80,100h10v10h-10z M90,100h10v10h-10z M100,100h10v10h-10z M120,100h10v10h-10z M140,100h10v10h-10z M160,100h10v10h-10z M180,100h10v10h-10z M200,100h10v10h-10z M220,100h10v10h-10z M240,100h10v10h-10z M260,100h10v10h-10z M280,100h10v10h-10z M300,100h10v10h-10z M320,100h10v10h-10z M340,100h10v10h-10z M350,100h10v10h-10z M360,100h10v10h-10z M370,100h10v10h-10z M380,100h10v10h-10z M390,100h10v10h-10z M400,100h10v10h-10z M120,110h10v10h-10z M140,110h10v10h-10z M150,110h10v10h-10z M160,110h10v10h-10z M170,110h10v10h-10z M220,110h10v10h-10z M250,110h10v10h-10z M290,110h10v10h-10z M320,110h10v10h-10z M60,120h10v10h-10z M70,120h10v10h-10z M80,120h10v10h-10z M100,120h10v10h-10z M120,120h10v10h-10z M130,120h10v10h-10z M150,120h10v10h-10z M160,120h10v10h-10z M200,120h10v10h-10z M210,120h10v10h-10z M240,120h10v10h-10z M260,120h10v10h-10z M300,120h10v10h-10z M330,120h10v10h-10z M340,120h10v10h-10z M350,120h10v10h-10z M380,120h10v10h-10z M390,120h10v10h-10z M400,120h10v10h-10z M50,130h10v10h-10z M70,130h10v10h-10z M90,130h10v10h-10z M110,130h10v10h-10z M120,130h10v10h-10z M140,130h10v10h-10z M160,130h10v10h-10z M200,130h10v10h-10z M210,130h10v10h-10z M220,130h10v10h-10z M230,130h10v10h-10z M240,130h10v10h-10z M250,130h10v10h-10z M280,130h10v10h-10z M290,130h10v10h-10z M310,130h10v10h-10z M330,130h10v10h-10z M350,130h10v10h-10z M100,140h10v10h-10z M130,140h10v10h-10z M140,140h10v10h-10z M150,140h10v10h-10z M170,140h10v10h-10z M180,140h10v10h-10z M190,140h10v10h-10z M200,140h10v10h-10z M220,140h10v10h-10z M230,140h10v10h-10z M250,140h10v10h-10z M270,140h10v10h-10z M280,140h10v10h-10z M290,140h10v10h-10z M300,140h10v10h-10z M310,140h10v10h-10z M320,140h10v10h-10z M340,140h10v10h-10z M350,140h10v10h-10z M360,140h10v10h-10z M390,140h10v10h-10z M400,140h10v10h-10z M40,150h10v10h-10z M50,150h10v10h-10z M80,150h10v10h-10z M110,150h10v10h-10z M120,150h10v10h-10z M150,150h10v10h-10z M160,150h10v10h-10z M170,150h10v10h-10z M180,150h10v10h-10z M200,150h10v10h-10z M210,150h10v10h-10z M220,150h10v10h-10z M230,150h10v10h-10z M240,150h10v10h-10z M250,150h10v10h-10z M280,150h10v10h-10z M300,150h10v10h-10z M320,150h10v10h-10z M340,150h10v10h-10z M350,150h10v10h-10z M360,150h10v10h-10z M390,150h10v10h-10z M40,160h10v10h-10z M50,160h10v10h-10z M70,160h10v10h-10z M90,160h10v10h-10z M100,160h10v10h-10z M130,160h10v10h-10z M150,160h10v10h-10z M160,160h10v10h-10z M180,160h10v10h-10z M200,160h10v10h-10z M220,160h10v10h-10z M250,160h10v10h-10z M270,160h10v10h-10z M290,160h10v10h-10z M300,160h10v10h-10z M330,160h10v10h-10z M340,160h10v10h-10z M350,160h10v10h-10z M360,160h10v10h-10z M380,160h10v10h-10z M390,160h10v10h-10z M400,160h10v10h-10z M110,170h10v10h-10z M130,170h10v10h-10z M140,170h10v10h-10z M150,170h10v10h-10z M160,170h10v10h-10z M170,170h10v10h-10z M190,170h10v10h-10z M200,170h10v10h-10z M210,170h10v10h-10z M240,170h10v10h-10z M300,170h10v10h-10z M320,170h10v10h-10z M330,170h10v10h-10z M350,170h10v10h-10z M370,170h10v10h-10z M380,170h10v10h-10z M60,180h10v10h-10z M70,180h10v10h-10z M80,180h10v10h-10z M90,180h10v10h-10z M100,180h10v10h-10z M170,180h10v10h-10z M190,180h10v10h-10z M230,180h10v10h-10z M260,180h10v10h-10z M270,180h10v10h-10z M280,180h10v10h-10z M300,180h10v10h-10z M310,180h10v10h-10z M330,180h10v10h-10z M370,180h10v10h-10z M390,180h10v10h-10z M400,180h10v10h-10z M50,190h10v10h-10z M60,190h10v10h-10z M70,190h10v10h-10z M80,190h10v10h-10z M110,190h10v10h-10z M120,190h10v10h-10z M130,190h10v10h-10z M160,190h10v10h-10z M170,190h10v10h-10z M190,190h10v10h-10z M200,190h10v10h-10z M250,190h10v10h-10z M260,190h10v10h-10z M320,190h10v10h-10z M360,190h10v10h-10z M390,190h10v10h-10z M40,200h10v10h-10z M50,200h10v10h-10z M60,200h10v10h-10z M80,200h10v10h-10z M100,200h10v10h-10z M120,200h10v10h-10z M130,200h10v10h-10z M140,200h10v10h-10z M180,200h10v10h-10z M200,200h10v10h-10z M210,200h10v10h-10z M220,200h10v10h-10z M240,200h10v10h-10z M260,200h10v10h-10z M270,200h10v10h-10z M280,200h10v10h-10z M290,200h10v10h-10z M320,200h10v10h-10z M330,200h10v10h-10z M340,200h10v10h-10z M360,200h10v10h-10z M380,200h10v10h-10z M400,200h10v10h-10z M60,210h10v10h-10z M70,210h10v10h-10z M80,210h10v10h-10z M110,210h10v10h-10z M120,210h10v10h-10z M130,210h10v10h-10z M160,210h10v10h-10z M170,210h10v10h-10z M190,210h10v10h-10z M290,210h10v10h-10z M300,210h10v10h-10z M350,210h10v10h-10z M370,210h10v10h-10z M380,210h10v10h-10z M90,220h10v10h-10z M100,220h10v10h-10z M110,220h10v10h-10z M140,220h10v10h-10z M150,220h10v10h-10z M160,220h10v10h-10z M170,220h10v10h-10z M180,220h10v10h-10z M200,220h10v10h-10z M210,220h10v10h-10z M230,220h10v10h-10z M240,220h10v10h-10z M270,220h10v10h-10z M280,220h10v10h-10z M290,220h10v10h-10z M300,220h10v10h-10z M310,220h10v10h-10z M320,220h10v10h-10z M330,220h10v10h-10z M340,220h10v10h-10z M350,220h10v10h-10z M360,220h10v10h-10z M380,220h10v10h-10z M390,220h10v10h-10z M400,220h10v10h-10z M40,230h10v10h-10z M50,230h10v10h-10z M60,230h10v10h-10z M170,230h10v10h-10z M190,230h10v10h-10z M200,230h10v10h-10z M300,230h10v10h-10z M310,230h10v10h-10z M330,230h10v10h-10z M340,230h10v10h-10z M350,230h10v10h-10z M360,230h10v10h-10z M400,230h10v10h-10z M40,240h10v10h-10z M50,240h10v10h-10z M70,240h10v10h-10z M80,240h10v10h-10z M100,240h10v10h-10z M110,240h10v10h-10z M120,240h10v10h-10z M160,240h10v10h-10z M180,240h10v10h-10z M210,240h10v10h-10z M220,240h10v10h-10z M240,240h10v10h-10z M270,240h10v10h-10z M280,240h10v10h-10z M290,240h10v10h-10z M310,240h10v10h-10z M330,240h10v10h-10z M340,240h10v10h-10z M350,240h10v10h-10z M360,240h10v10h-10z M380,240h10v10h-10z M40,250h10v10h-10z M50,250h10v10h-10z M60,250h10v10h-10z M70,250h10v10h-10z M90,250h10v10h-10z M120,250h10v10h-10z M130,250h10v10h-10z M140,250h10v10h-10z M150,250h10v10h-10z M180,250h10v10h-10z M190,250h10v10h-10z M250,250h10v10h-10z M260,250h10v10h-10z M270,250h10v10h-10z M280,250h10v10h-10z M350,250h10v10h-10z M370,250h10v10h-10z M380,250h10v10h-10z M40,260h10v10h-10z M50,260h10v10h-10z M60,260h10v10h-10z M80,260h10v10h-10z M100,260h10v10h-10z M110,260h10v10h-10z M130,260h10v10h-10z M160,260h10v10h-10z M170,260h10v10h-10z M180,260h10v10h-10z M190,260h10v10h-10z M210,260h10v10h-10z M240,260h10v10h-10z M250,260h10v10h-10z M260,260h10v10h-10z M270,260h10v10h-10z M280,260h10v10h-10z M310,260h10v10h-10z M340,260h10v10h-10z M390,260h10v10h-10z M400,260h10v10h-10z M60,270h10v10h-10z M70,270h10v10h-10z M130,270h10v10h-10z M150,270h10v10h-10z M160,270h10v10h-10z M190,270h10v10h-10z M200,270h10v10h-10z M210,270h10v10h-10z M260,270h10v10h-10z M270,270h10v10h-10z M300,270h10v10h-10z M330,270h10v10h-10z M350,270h10v10h-10z M50,280h10v10h-10z M60,280h10v10h-10z M70,280h10v10h-10z M80,280h10v10h-10z M100,280h10v10h-10z M110,280h10v10h-10z M140,280h10v10h-10z M160,280h10v10h-10z M170,280h10v10h-10z M180,280h10v10h-10z M210,280h10v10h-10z M230,280h10v10h-10z M250,280h10v10h-10z M330,280h10v10h-10z M340,280h10v10h-10z M360,280h10v10h-10z M380,280h10v10h-10z M390,280h10v10h-10z M400,280h10v10h-10z M40,290h10v10h-10z M50,290h10v10h-10z M60,290h10v10h-10z M70,290h10v10h-10z M90,290h10v10h-10z M120,290h10v10h-10z M130,290h10v10h-10z M140,290h10v10h-10z M160,290h10v10h-10z M170,290h10v10h-10z M180,290h10v10h-10z M210,290h10v10h-10z M240,290h10v10h-10z M250,290h10v10h-10z M260,290h10v10h-10z M280,290h10v10h-10z M300,290h10v10h-10z M350,290h10v10h-10z M370,290h10v10h-10z M40,300h10v10h-10z M60,300h10v10h-10z M80,300h10v10h-10z M100,300h10v10h-10z M120,300h10v10h-10z M140,300h10v10h-10z M150,300h10v10h-10z M160,300h10v10h-10z M180,300h10v10h-10z M190,300h10v10h-10z M200,300h10v10h-10z M230,300h10v10h-10z M250,300h10v10h-10z M260,300h10v10h-10z M290,300h10v10h-10z M310,300h10v10h-10z M320,300h10v10h-10z M340,300h10v10h-10z M370,300h10v10h-10z M380,300h10v10h-10z M390,300h10v10h-10z M400,300h10v10h-10z M40,310h10v10h-10z M70,310h10v10h-10z M80,310h10v10h-10z M90,310h10v10h-10z M110,310h10v10h-10z M120,310h10v10h-10z M130,310h10v10h-10z M150,310h10v10h-10z M190,310h10v10h-10z M240,310h10v10h-10z M260,310h10v10h-10z M280,310h10v10h-10z M310,310h10v10h-10z M320,310h10v10h-10z M330,310h10v10h-10z M350,310h10v10h-10z M40,320h10v10h-10z M90,320h10v10h-10z M100,320h10v10h-10z M140,320h10v10h-10z M150,320h10v10h-10z M190,320h10v10h-10z M210,320h10v10h-10z M240,320h10v10h-10z M260,320h10v10h-10z M290,320h10v10h-10z M300,320h10v10h-10z M310,320h10v10h-10z M320,320h10v10h-10z M330,320h10v10h-10z M340,320h10v10h-10z M350,320h10v10h-10z M360,320h10v10h-10z M370,320h10v10h-10z M380,320h10v10h-10z M390,320h10v10h-10z M120,330h10v10h-10z M130,330h10v10h-10z M170,330h10v10h-10z M190,330h10v10h-10z M200,330h10v10h-10z M210,330h10v10h-10z M220,330h10v10h-10z M240,330h10v10h-10z M250,330h10v10h-10z M260,330h10v10h-10z M270,330h10v10h-10z M310,330h10v10h-10z M320,330h10v10h-10z M360,330h10v10h-10z M40,340h10v10h-10z M50,340h10v10h-10z M60,340h10v10h-10z M70,340h10v10h-10z M80,340h10v10h-10z M90,340h10v10h-10z M100,340h10v10h-10z M160,340h10v10h-10z M170,340h10v10h-10z M190,340h10v10h-10z M210,340h10v10h-10z M220,340h10v10h-10z M230,340h10v10h-10z M240,340h10v10h-10z M290,340h10v10h-10z M320,340h10v10h-10z M340,340h10v10h-10z M360,340h10v10h-10z M370,340h10v10h-10z M390,340h10v10h-10z M400,340h10v10h-10z M40,350h10v10h-10z M100,350h10v10h-10z M130,350h10v10h-10z M170,350h10v10h-10z M190,350h10v10h-10z M210,350h10v10h-10z M220,350h10v10h-10z M230,350h10v10h-10z M250,350h10v10h-10z M260,350h10v10h-10z M270,350h10v10h-10z M300,350h10v10h-10z M310,350h10v10h-10z M320,350h10v10h-10z M360,350h10v10h-10z M390,350h10v10h-10z M40,360h10v10h-10z M60,360h10v10h-10z M70,360h10v10h-10z M80,360h10v10h-10z M100,360h10v10h-10z M120,360h10v10h-10z M130,360h10v10h-10z M140,360h10v10h-10z M150,360h10v10h-10z M170,360h10v10h-10z M190,360h10v10h-10z M200,360h10v10h-10z M210,360h10v10h-10z M220,360h10v10h-10z M240,360h10v10h-10z M250,360h10v10h-10z M270,360h10v10h-10z M280,360h10v10h-10z M290,360h10v10h-10z M310,360h10v10h-10z M320,360h10v10h-10z M330,360h10v10h-10z M340,360h10v10h-10z M350,360h10v10h-10z M360,360h10v10h-10z M380,360h10v10h-10z M390,360h10v10h-10z M40,370h10v10h-10z M60,370h10v10h-10z M70,370h10v10h-10z M80,370h10v10h-10z M100,370h10v10h-10z M120,370h10v10h-10z M130,370h10v10h-10z M140,370h10v10h-10z M150,370h10v10h-10z M160,370h10v10h-10z M190,370h10v10h-10z M200,370h10v10h-10z M210,370h10v10h-10z M220,370h10v10h-10z M240,370h10v10h-10z M250,370h10v10h-10z M260,370h10v10h-10z M290,370h10v10h-10z M310,370h10v10h-10z M320,370h10v10h-10z M340,370h10v10h-10z M360,370h10v10h-10z M370,370h10v10h-10z M380,370h10v10h-10z M40,380h10v10h-10z M60,380h10v10h-10z M70,380h10v10h-10z M80,380h10v10h-10z M100,380h10v10h-10z M120,380h10v10h-10z M130,380h10v10h-10z M140,380h10v10h-10z M150,380h10v10h-10z M160,380h10v10h-10z M170,380h10v10h-10z M190,380h10v10h-10z M230,380h10v10h-10z M260,380h10v10h-10z M270,380h10v10h-10z M280,380h10v10h-10z M290,380h10v10h-10z M300,380h10v10h-10z M310,380h10v10h-10z M330,380h10v10h-10z M350,380h10v10h-10z M400,380h10v10h-10z M40,390h10v10h-10z M100,390h10v10h-10z M130,390h10v10h-10z M140,390h10v10h-10z M150,390h10v10h-10z M170,390h10v10h-10z M200,390h10v10h-10z M240,390h10v10h-10z M270,390h10v10h-10z M300,390h10v10h-10z M320,390h10v10h-10z M330,390h10v10h-10z M340,390h10v10h-10z M400,390h10v10h-10z M40,400h10v10h-10z M50,400h10v10h-10z M60,400h10v10h-10z M70,400h10v10h-10z M80,400h10v10h-10z M90,400h10v10h-10z M100,400h10v10h-10z M140,400h10v10h-10z M170,400h10v10h-10z M190,400h10v10h-10z M200,400h10v10h-10z M240,400h10v10h-10z M250,400h10v10h-10z M260,400h10v10h-10z M270,400h10v10h-10z M280,400h10v10h-10z M300,400h10v10h-10z M310,400h10v10h-10z M330,400h10v10h-10z M340,400h10v10h-10z M350,400h10v10h-10z M370,400h10v10h-10z M380,400h10v10h-10z M390,400h10v10h-10z M400,400h10v10h-10z "/>
+</svg>
+              </div>
+              <span class="text-[10px] font-bold text-zinc-800 mt-2 block">SCAN FOR VIDEO</span>
+              <span class="text-[9px] text-zinc-500 block">스마트폰으로 스캔하여 감상</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons for QR & Placard -->
+        <div class="flex items-center space-x-3 pt-2">
+          <button id="btnDownloadQrImage" class="flex-1 py-2.5 rounded-xl bg-gallery-800 hover:bg-gallery-700 text-gallery-100 font-semibold border border-gallery-700 transition flex items-center justify-center space-x-1.5">
+            <svg class="w-4 h-4 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            <span>QR 코드 이미지(PNG) 다운로드</span>
+          </button>
+          <button id="btnPrintPlacard" class="flex-1 py-2.5 rounded-xl bg-accent-500 hover:bg-accent-400 text-white font-semibold transition flex items-center justify-center space-x-1.5 shadow-lg shadow-accent-500/20">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+            <span>전시대 명제표 인쇄 (Print)</span>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= MODAL: ADD VIDEO / GITHUB SYNC (CMS) ================= -->
+  <div id="uploadModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="bg-gallery-900 border border-gallery-800 rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      
+      <!-- Modal Header -->
+      <div class="px-6 py-4 border-b border-gallery-800 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
           </svg>
-          <h3 class="text-base font-bold text-white">영상 등록 및 GitHub 자동 연동</h3>
+          <h3 class="text-base font-bold text-white">영상 업로드 및 지속 등록 시스템</h3>
         </div>
         <button id="btnCloseUploadModal" class="text-gallery-300 hover:text-white transition p-1">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -573,33 +773,26 @@
         <!-- TAB 1: LOCAL DRAG & DROP -->
         <div id="tab-local" class="modal-tab-content space-y-4">
           <p class="text-gallery-300">
-            전시장 현장 데스크에서 컴퓨터에 있는 <code class="text-accent-300">.mp4</code>, <code class="text-accent-300">.webm</code> 영상 파일을 끌어다 놓으면 서버 업로드 없이 브라우저에서 즉시 고화질로 재생됩니다.
+            나중에 완성된 영상 파일(<code class="text-accent-300">.mp4</code>, <code class="text-accent-300">.webm</code>)을 전시장 컴퓨터에서 끌어다 놓으면, 깃허브 업로드 전이라도 브라우저에서 즉시 4K 원본 화질로 무한 반복 재생됩니다.
           </p>
           
           <div id="dropZone" class="border-2 border-dashed border-gallery-700 hover:border-accent-400 rounded-2xl p-8 text-center cursor-pointer transition bg-gallery-950/40">
             <svg class="w-10 h-10 text-accent-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
             </svg>
-            <p class="font-medium text-gallery-100">이곳을 클릭하거나 영상 파일을 끌어다 놓으세요</p>
-            <p class="text-[11px] text-gallery-300 mt-1">MP4, WebM, MOV 지원 (로컬 임시 재생용)</p>
+            <p class="font-medium text-gallery-100">이곳을 클릭하거나 완성된 영상 파일을 끌어다 놓으세요</p>
+            <p class="text-[11px] text-gallery-300 mt-1">MP4, WebM, MOV 고화질 영상 지원</p>
             <input id="localFileInput" type="file" accept="video/mp4,video/webm,video/quicktime" class="hidden" multiple>
           </div>
 
-          <!-- Metadata for local file -->
           <div class="grid grid-cols-2 gap-3 pt-2">
             <div>
-              <label class="block text-gallery-300 mb-1">작가명 (선택)</label>
-              <input id="localArtistInput" type="text" placeholder="예: 홍길동" class="w-full px-3 py-2 rounded-lg bg-gallery-850 border border-gallery-700 text-gallery-100 focus:outline-none focus:border-accent-500">
+              <label class="block text-gallery-300 mb-1">작품 제목 (선택)</label>
+              <input id="localTitleInput" type="text" placeholder="예: 2차 심사용 작품" class="w-full px-3 py-2 rounded-lg bg-gallery-850 border border-gallery-700 text-gallery-100 focus:outline-none focus:border-accent-500">
             </div>
             <div>
-              <label class="block text-gallery-300 mb-1">분야 / 전공</label>
-              <select id="localCategorySelect" class="w-full px-3 py-2 rounded-lg bg-gallery-850 border border-gallery-700 text-gallery-100 focus:outline-none focus:border-accent-500">
-                <option value="미디어아트">미디어아트</option>
-                <option value="애니메이션">애니메이션</option>
-                <option value="단편영화">단편영화</option>
-                <option value="모션그래픽">모션그래픽</option>
-                <option value="인터랙티브">인터랙티브</option>
-              </select>
+              <label class="block text-gallery-300 mb-1">작가명 (선택)</label>
+              <input id="localArtistInput" type="text" placeholder="예: 출품 작가" class="w-full px-3 py-2 rounded-lg bg-gallery-850 border border-gallery-700 text-gallery-100 focus:outline-none focus:border-accent-500">
             </div>
           </div>
         </div>
@@ -607,7 +800,7 @@
         <!-- TAB 2: GITHUB REPOSITORY SYNC -->
         <div id="tab-github" class="modal-tab-content hidden space-y-4">
           <div class="p-3 bg-accent-500/10 border border-accent-500/20 rounded-xl text-accent-300 text-[11px] leading-relaxed">
-            💡 <strong>상시 구동 핵심 기능:</strong> GitHub 저장소의 <code class="bg-black/40 px-1 py-0.5 rounded">videos/</code> 폴더에 학생들의 영상을 올린 뒤, 저장소 주소를 연동하면 사이트가 GitHub API로 영상 파일 목록을 자동으로 가져와 즉시 재생 목록을 생성합니다!
+            💡 <strong>상시 구동 핵심 기능:</strong> GitHub 저장소의 <code class="bg-black/40 px-1 py-0.5 rounded">videos/</code> 폴더에 영상을 올릴 때마다, 사이트가 깃허브 API를 통해 자동으로 새 파일을 감지하여 재생 목록을 갱신합니다!
           </div>
 
           <div class="space-y-3">
@@ -639,7 +832,7 @@
         <!-- TAB 3: DIRECT URL / YOUTUBE / VIMEO -->
         <div id="tab-url" class="modal-tab-content hidden space-y-3">
           <p class="text-gallery-300">
-            100MB가 넘는 4K 영상은 유튜브(일부공개 Unlisted)나 비메오, 또는 외부 CDN MP4 직링크를 등록하여 끊김 없이 상영할 수 있습니다.
+            100MB를 초과하는 고화질 4K 대용량 영상은 유튜브(일부공개 Unlisted)나 비메오, 구글 드라이브 직링크로 등록하여 트래픽 제한 없이 상영할 수 있습니다.
           </p>
 
           <div>
@@ -650,11 +843,11 @@
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-gallery-300 mb-1">작품 제목 *</label>
-              <input id="inputUrlTitle" type="text" placeholder="예: 시간의 경계" class="w-full px-3 py-2 rounded-lg bg-gallery-850 border border-gallery-700 text-gallery-100 focus:outline-none focus:border-accent-500">
+              <input id="inputUrlTitle" type="text" placeholder="예: 2차 심사용 작품" class="w-full px-3 py-2 rounded-lg bg-gallery-850 border border-gallery-700 text-gallery-100 focus:outline-none focus:border-accent-500">
             </div>
             <div>
               <label class="block text-gallery-300 mb-1">작가명 *</label>
-              <input id="inputUrlArtist" type="text" placeholder="예: 이도윤" class="w-full px-3 py-2 rounded-lg bg-gallery-850 border border-gallery-700 text-gallery-100 focus:outline-none focus:border-accent-500">
+              <input id="inputUrlArtist" type="text" placeholder="예: 출품 작가" class="w-full px-3 py-2 rounded-lg bg-gallery-850 border border-gallery-700 text-gallery-100 focus:outline-none focus:border-accent-500">
             </div>
           </div>
 
@@ -671,7 +864,7 @@
             </div>
             <div>
               <label class="block text-gallery-300 mb-1">러닝타임</label>
-              <input id="inputUrlRuntime" type="text" placeholder="예: 05:20" class="w-full px-3 py-2 rounded-lg bg-gallery-850 border border-gallery-700 text-gallery-100 focus:outline-none focus:border-accent-500">
+              <input id="inputUrlRuntime" type="text" placeholder="예: 00:59" class="w-full px-3 py-2 rounded-lg bg-gallery-850 border border-gallery-700 text-gallery-100 focus:outline-none focus:border-accent-500">
             </div>
           </div>
 
@@ -688,7 +881,7 @@
         <!-- TAB 4: JSON EXPORT & IMPORT -->
         <div id="tab-json" class="modal-tab-content hidden space-y-3">
           <p class="text-gallery-300">
-            GitHub 저장소의 루트에 <code class="text-accent-300 bg-gallery-950 px-1 py-0.5 rounded">videos.json</code> 파일을 만들어 아래 코드를 붙여넣으면, 사이트가 켜질 때마다 이 목록을 읽어옵니다.
+            등록한 전체 목록이 담긴 <code class="text-accent-300 bg-gallery-950 px-1 py-0.5 rounded">videos.json</code> 파일을 다운로드하여 GitHub 저장소 루트에 올리면, 누구나 접속할 때마다 이 목록을 읽어옵니다.
           </p>
           <textarea id="jsonOutputText" rows="7" readonly class="w-full font-mono text-[11px] p-3 rounded-lg bg-gallery-950 border border-gallery-800 text-accent-300 focus:outline-none"></textarea>
           <div class="flex space-x-2">
@@ -763,98 +956,6 @@
     </div>
   </div>
 
-  <!-- ================= MODAL: FULL GITHUB PAGES GUIDE ================= -->
-  <div id="guideModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-    <div class="bg-gallery-900 border border-gallery-800 rounded-2xl max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
-      <div class="px-6 py-4 border-b border-gallery-800 flex items-center justify-between">
-        <h3 class="text-base font-bold text-white flex items-center space-x-2">
-          <span>📖 GitHub Pages 상시 상영관 A to Z 완벽 구축 매뉴얼</span>
-        </h3>
-        <button id="btnCloseGuideModal" class="text-gallery-300 hover:text-white transition">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
-      </div>
-
-      <div class="p-6 overflow-y-auto space-y-6 text-xs text-gallery-200 leading-relaxed">
-        
-        <!-- Step 1 -->
-        <div class="space-y-2">
-          <h4 class="text-sm font-bold text-accent-300 flex items-center space-x-2">
-            <span class="w-5 h-5 rounded-full bg-accent-500 text-white inline-flex items-center justify-center text-xs">1</span>
-            <span>깃허브(GitHub) 저장소(Repository) 만들기</span>
-          </h4>
-          <ol class="list-decimal list-inside space-y-1 pl-2 text-gallery-300">
-            <li><a href="https://github.com" target="_blank" class="text-accent-400 underline">GitHub.com</a> 로그인 후 우측 상단 <strong>[+]</strong> → <strong>[New repository]</strong> 클릭</li>
-            <li>Repository name에 원하는 주소 입력 (예: <code class="text-white bg-gallery-850 px-1 py-0.5 rounded">grad-exhibition-2026</code>)</li>
-            <li><strong>Public</strong>(공개) 선택 (무료 GitHub Pages는 Public 저장소에서 지원됩니다)</li>
-            <li><strong>Add a README file</strong> 체크 후 <strong>[Create repository]</strong> 클릭</li>
-          </ol>
-        </div>
-
-        <!-- Step 2 -->
-        <div class="space-y-2">
-          <h4 class="text-sm font-bold text-accent-300 flex items-center space-x-2">
-            <span class="w-5 h-5 rounded-full bg-accent-500 text-white inline-flex items-center justify-center text-xs">2</span>
-            <span>index.html 파일 업로드하기</span>
-          </h4>
-          <p class="text-gallery-300 pl-2">
-            현재 보고 계시는 이 웹페이지 코드 전체를 <code class="text-white bg-gallery-850 px-1 py-0.5 rounded">index.html</code> 이라는 이름으로 저장소 루트에 올립니다. (저장소 페이지에서 <strong>[Add file]</strong> → <strong>[Upload files]</strong> 사용)
-          </p>
-        </div>
-
-        <!-- Step 3 -->
-        <div class="space-y-2">
-          <h4 class="text-sm font-bold text-accent-300 flex items-center space-x-2">
-            <span class="w-5 h-5 rounded-full bg-accent-500 text-white inline-flex items-center justify-center text-xs">3</span>
-            <span>GitHub Pages 24시간 상시 호스팅 활성화</span>
-          </h4>
-          <ol class="list-decimal list-inside space-y-1 pl-2 text-gallery-300">
-            <li>저장소 상단 메뉴의 <strong>[Settings]</strong> 탭 클릭</li>
-            <li>좌측 사이드바에서 <strong>[Pages]</strong> 클릭</li>
-            <li><strong>Branch</strong> 설정에서 <code class="text-white bg-gallery-850 px-1 py-0.5 rounded">main</code> (또는 master) 브랜치와 <code class="text-white bg-gallery-850 px-1 py-0.5 rounded">/ (root)</code> 폴더 선택 후 <strong>[Save]</strong> 클릭</li>
-            <li>1~2분 뒤 <code class="text-emerald-400 font-mono">https://[내아이디].github.io/[저장소이름]/</code> 상설 사이트 주소가 완성됩니다!</li>
-          </ol>
-        </div>
-
-        <!-- Step 4 -->
-        <div class="space-y-2">
-          <h4 class="text-sm font-bold text-accent-300 flex items-center space-x-2">
-            <span class="w-5 h-5 rounded-full bg-accent-500 text-white inline-flex items-center justify-center text-xs">4</span>
-            <span>학생 영상 업로드 즉시 자동 재생 방식 2가지</span>
-          </h4>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pl-2">
-            <div class="p-3 bg-gallery-950 rounded-xl border border-gallery-800">
-              <strong class="text-white block mb-1">방식 A. videos/ 폴더 자동 스캔 (가장 간편)</strong>
-              <p class="text-gallery-300 text-[11px]">
-                저장소에 <code class="text-accent-300">videos/</code> 폴더를 만들고 영상 파일을 커밋하면, 사이트가 깃허브 API를 호출해 자동으로 영상을 찾아 재생 목록에 띄웁니다.
-              </p>
-            </div>
-            <div class="p-3 bg-gallery-950 rounded-xl border border-gallery-800">
-              <strong class="text-white block mb-1">방식 B. videos.json 목록 파일 관리 (정석)</strong>
-              <p class="text-gallery-300 text-[11px]">
-                학생별 작품명, 작가명, 설명, 유튜브/비메오 링크까지 정교하게 표기하고 싶을 때는 <code class="text-accent-300">videos.json</code>을 수정하여 커밋합니다.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 5 -->
-        <div class="space-y-2">
-          <h4 class="text-sm font-bold text-accent-300 flex items-center space-x-2">
-            <span class="w-5 h-5 rounded-full bg-accent-500 text-white inline-flex items-center justify-center text-xs">5</span>
-            <span>전시장 상설 태블릿 / 빔프로젝터 세팅 팁</span>
-          </h4>
-          <ul class="list-disc list-inside space-y-1 pl-2 text-gallery-300">
-            <li>크롬 브라우저에서 사이트 접속 후 <kbd class="bg-gallery-850 px-1 py-0.5 rounded text-white font-mono">F11</kbd> 또는 <kbd class="bg-gallery-850 px-1 py-0.5 rounded text-white font-mono">F</kbd>를 누르면 주소창 없는 순수 갤러리 뷰로 전환됩니다.</li>
-            <li>OS 절전 모드 해제: 맥(화면 잠금 안 함 설정 또는 Amphetamine 앱), 윈도우(화면 및 절전 '안 함' 설정).</li>
-            <li>브라우저 자동 오디오 차단 방지를 위해 사이트 첫 로드 시 [사운드 켜기] 버튼을 한 번 눌러주세요.</li>
-          </ul>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
   <!-- ================= IN-PAGE TOAST NOTIFICATION ================= -->
   <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none flex items-center space-x-2 px-4 py-3 rounded-xl bg-gallery-850 border border-gallery-700 text-white text-xs shadow-2xl">
     <span id="toastIcon">✨</span>
@@ -863,66 +964,21 @@
 
   <!-- ================= CORE JAVASCRIPT ================= -->
   <script>
-    /* Default initial exhibition playlist */
+    /* Default Initial Playlist containing ONLY user's Overdose artwork */
     const DEFAULT_VIDEOS = [
       {
-        id: 'work-1',
-        title: '공명 (Resonance)',
-        artist: '김서연',
-        major: '미디어아트전공',
+        id: 'work-overdose',
+        title: 'Overdose',
+        artist: 'rockyone1243',
+        major: '미디어아트 / 디지털영상',
         year: '2026',
         category: '미디어아트',
-        runtime: '04:32',
-        spec: '4K UHD / Stereo Soundscape',
-        medium: '3D Generative Motion, Soundscape',
-        statement: '보이지 않는 파동과 디지털 공간 속에서의 기억의 잔상을 시각화한 작품입니다. 실시간 생성형 알고리즘을 통해 관객과 공간, 그리고 소리가 상호작용하며 형성하는 유기적인 형태의 공명을 탐구합니다.',
-        thumbnail: 'user_uploaded_files/ttl=63d/tool_generated/watermarked_img_10453495243363747600.jpg',
-        src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-        type: 'video/mp4'
-      },
-      {
-        id: 'work-2',
-        title: '유영하는 빛의 연대기 (Chronicles of Light)',
-        artist: '박준형',
-        major: '영상디자인전공',
-        year: '2026',
-        category: '모션그래픽',
-        runtime: '03:15',
-        spec: '1080p FHD / Spatial Audio',
-        medium: 'Cinema 4D, Octane, After Effects',
-        statement: '물질과 빛의 경계면에서 일어나는 빛의 굴절과 분산을 몽환적인 3차원 모션으로 재구성한 영상입니다. 현대인이 느끼는 고립감과 이를 치유하는 초현실적 빛의 흐름을 표현했습니다.',
-        thumbnail: 'user_uploaded_files/ttl=63d/tool_generated/watermarked_img_7018389407855414249.jpg',
-        src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-        type: 'video/mp4'
-      },
-      {
-        id: 'work-3',
-        title: '도시의 숨 (Breath of the Metropolis)',
-        artist: '이지민 & 최원호',
-        major: '디지털영상전공',
-        year: '2026',
-        category: '단편영화',
-        runtime: '06:40',
-        spec: 'Cinema 2.39:1 / Dolby 5.1',
-        medium: 'Live-action Cinematography, Ambient Drone',
-        statement: '새벽 4시부터 심야 24시까지, 메트로폴리스 서울의 폐쇄회로(CCTV) 시점과 도시 미학적 프레임을 교차하여 하나의 거대한 생명체로서 숨 쉬는 도시의 이면을 기록한 시네마틱 다큐멘터리입니다.',
-        thumbnail: 'user_uploaded_files/ttl=63d/tool_generated/watermarked_img_7018389407855414249.jpg',
-        src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-        type: 'video/mp4'
-      },
-      {
-        id: 'work-4',
-        title: '달콤한 결핍 (Sweet Deficiency)',
-        artist: '정유진',
-        major: '애니메이션전공',
-        year: '2026',
-        category: '애니메이션',
-        runtime: '05:12',
-        spec: '2D Hand-drawn / Orchestral Score',
-        medium: '2D Digital Animation, Clip Studio',
-        statement: '현대 사회에서 우리가 소비하는 수많은 즉각적인 쾌락과 그 이면에 찾아오는 공허함을 설탕과 디저트로 가득 찬 기이한 세계에 갇힌 주인공의 여정을 통해 은유적으로 표현한 2D 애니메이션입니다.',
-        thumbnail: 'user_uploaded_files/ttl=63d/tool_generated/watermarked_img_10453495243363747600.jpg',
-        src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+        runtime: '00:59',
+        spec: '1080p FHD 60fps / Stereo Audio',
+        medium: 'Single Channel Video, Glitch Art & Noise',
+        statement: '미디어 과포화(Overdose)와 디지털 시각 매체의 범람 속에서 파편화되는 현대인의 감각과 기억을 다채널 모니터의 결함(Glitch)과 노이즈, 통신 두절(NO SIGNAL) 화면의 교차를 통해 표현한 1분 단편 미디어아트 작품입니다.',
+        thumbnail: 'user_uploaded_files/ttl=63d/tool_generated/overdose_thumb.jpg',
+        src: 'videos/Overdose.mp4',
         type: 'video/mp4'
       }
     ];
@@ -935,21 +991,22 @@
       isMuted: false,
       volume: 0.8,
       speed: 1.0,
-      loopMode: 'all', // 'all' | 'single' | 'none'
+      loopMode: 'all',
       filterCategory: 'all',
       searchQuery: '',
       isKiosk: false,
       kioskIdleTimer: null,
       settings: {
-        title: '2026 졸업작품 영상 상시 상영관',
-        dept: '미디어디자인 / 영상애니메이션 / 디지털아트 졸업전시',
+        title: 'Overdose | 2026 졸업작품 영상 상시 상영관',
+        dept: '미디어아트 / 디지털영상 (Artist: rockyone1243)',
         autoNext: true,
         loopAll: true,
         blackoutFade: true,
         idleSeconds: 3,
-        ghRepo: '',
+        ghRepo: 'rockyone1243/Overdose',
         ghBranch: 'main',
-        ghAutoPoll: true
+        ghAutoPoll: true,
+        qrUrl: 'https://rockyone1243.github.io/Overdose/'
       }
     };
 
@@ -959,12 +1016,12 @@
     const kioskVideo = document.getElementById('kioskVideoPlayer');
     const videoCurtain = document.getElementById('videoCurtain');
     const kioskCurtain = document.getElementById('kioskCurtain');
+    const standbyOverlay = document.getElementById('standbyOverlay');
 
     const btnPlayPause = document.getElementById('btnPlayPause');
     const btnPlayPauseIcon = document.getElementById('btnPlayPauseIcon');
     const btnPrevVideo = document.getElementById('btnPrevVideo');
     const btnNextVideo = document.getElementById('btnNextVideo');
-    const btnTriggerNext = document.getElementById('btnTriggerNext');
     const btnMuteToggle = document.getElementById('btnMuteToggle');
     const volumeIcon = document.getElementById('volumeIcon');
     const volumeSlider = document.getElementById('volumeSlider');
@@ -1007,7 +1064,6 @@
       }, 3000);
     }
 
-    /* Format Seconds to MM:SS */
     function formatTime(seconds) {
       if (isNaN(seconds) || seconds < 0) return '00:00';
       const m = Math.floor(seconds / 60);
@@ -1015,14 +1071,14 @@
       return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
     }
 
-    /* Load Saved State from localStorage safely */
+    /* LocalStorage persistence */
     function loadSavedState() {
       try {
         const savedSettings = localStorage.getItem('grad_exhibition_settings');
         if (savedSettings) {
           state.settings = { ...state.settings, ...JSON.parse(savedSettings) };
         }
-        const savedVideos = localStorage.getItem('grad_exhibition_videos');
+        const savedVideos = localStorage.getItem('grad_exhibition_videos_custom');
         if (savedVideos) {
           const parsed = JSON.parse(savedVideos);
           if (Array.isArray(parsed) && parsed.length > 0) {
@@ -1034,23 +1090,21 @@
       }
     }
 
-    /* Save Settings */
     function persistState() {
       try {
         localStorage.setItem('grad_exhibition_settings', JSON.stringify(state.settings));
-        localStorage.setItem('grad_exhibition_videos', JSON.stringify(state.videos));
+        localStorage.setItem('grad_exhibition_videos_custom', JSON.stringify(state.videos));
       } catch (err) {
         console.warn('LocalStorage write bypassed:', err);
       }
     }
 
-    /* Load and Play Video by Index */
-    function playVideoAtIndex(index, immediatePlay = true) {
+    /* Video Player Setup */
+    function playVideoAtIndex(index, immediatePlay = false) {
       if (index < 0 || index >= state.videos.length) return;
       state.currentIndex = index;
       const item = state.videos[index];
 
-      // Smooth curtain fade transition
       if (state.settings.blackoutFade) {
         videoCurtain.classList.add('opacity-100');
         kioskCurtain.classList.add('opacity-100');
@@ -1069,6 +1123,7 @@
       updateKioskPlacardUI(item);
       renderCardsGrid();
       updateJsonExporter();
+      updatePrintablePlacard(item);
     }
 
     function setupCurrentVideoSource(item, immediatePlay) {
@@ -1076,6 +1131,7 @@
 
       if (isEmbed) {
         mainVideo.classList.add('hidden');
+        standbyOverlay.classList.add('hidden');
         embedPlayer.classList.remove('hidden');
         
         let embedUrl = item.src;
@@ -1110,17 +1166,21 @@
           if (playPromise !== undefined) {
             playPromise.then(() => {
               state.isPlaying = true;
+              standbyOverlay.classList.add('hidden');
               updatePlayButtonUI();
               if (state.isKiosk) kioskVideo.play();
             }).catch(e => {
-              console.log('Autoplay muted fallback triggered:', e);
-              // Fallback to muted autoplay
+              console.log('Autoplay muted fallback:', e);
               mainVideo.muted = true;
               state.isMuted = true;
               updateVolumeUI();
               mainVideo.play().then(() => {
                 state.isPlaying = true;
+                standbyOverlay.classList.add('hidden');
                 updatePlayButtonUI();
+              }).catch(() => {
+                // If local file path is not reachable yet, show standby card
+                standbyOverlay.classList.remove('hidden');
               });
             });
           }
@@ -1131,7 +1191,6 @@
       }
     }
 
-    /* Update Gallery Placard (Left Details) */
     function updatePlacardUI(item, index) {
       detailIndexBadge.textContent = `NO. ${String(index + 1).padStart(2, '0')} / EXHIBIT`;
       detailYearBadge.textContent = `${item.year || '2026'} GRADUATION`;
@@ -1139,13 +1198,12 @@
       detailArtist.textContent = item.artist;
       detailMajor.textContent = item.major;
       detailMedium.textContent = item.medium || 'Digital Media';
-      detailRuntime.textContent = item.runtime || '00:00';
-      detailSpec.textContent = item.spec || 'FHD 1080p';
+      detailRuntime.textContent = item.runtime || '00:59';
+      detailSpec.textContent = item.spec || '4K Master / Stereo Sound';
       detailStatement.textContent = item.statement || '작가 노트가 등록되지 않았습니다.';
-      badgeCategory.textContent = item.category || '전시';
+      badgeCategory.textContent = item.category || '미디어아트';
     }
 
-    /* Update Kiosk Placard */
     function updateKioskPlacardUI(item) {
       document.getElementById('kioskArtworkTitle').textContent = item.title;
       document.getElementById('kioskArtistName').textContent = item.artist;
@@ -1154,12 +1212,26 @@
       document.getElementById('kioskRuntimeBadge').textContent = item.runtime;
     }
 
+    function updatePrintablePlacard(item) {
+      document.getElementById('placardPrintTitle').textContent = item.title;
+      document.getElementById('placardPrintArtist').textContent = item.artist;
+      document.getElementById('placardPrintMajor').textContent = item.major;
+      document.getElementById('placardPrintMedium').textContent = item.medium || 'Single Channel Video';
+      document.getElementById('placardPrintRuntime').textContent = item.runtime || '00:59';
+      document.getElementById('placardPrintStatement').textContent = item.statement || '';
+      document.getElementById('placardPrintExhibition').textContent = state.settings.title;
+    }
+
     /* Play/Pause Toggle */
     function togglePlayPause() {
       if (mainVideo.paused) {
-        mainVideo.play();
+        mainVideo.play().then(() => {
+          state.isPlaying = true;
+          standbyOverlay.classList.add('hidden');
+        }).catch(() => {
+          standbyOverlay.classList.remove('hidden');
+        });
         if (state.isKiosk) kioskVideo.play();
-        state.isPlaying = true;
       } else {
         mainVideo.pause();
         if (state.isKiosk) kioskVideo.pause();
@@ -1197,7 +1269,6 @@
       }
     }
 
-    /* Loop Mode Toggle */
     function toggleLoopMode() {
       if (state.loopMode === 'all') {
         state.loopMode = 'single';
@@ -1214,30 +1285,23 @@
       }
     }
 
-    /* Next / Previous Work */
     function nextArtwork() {
       if (state.videos.length === 0) return;
       let nextIdx = state.currentIndex + 1;
       if (nextIdx >= state.videos.length) {
-        if (state.loopMode === 'all' || state.settings.loopAll) {
-          nextIdx = 0;
-        } else {
-          return;
-        }
+        if (state.loopMode === 'all' || state.settings.loopAll) nextIdx = 0;
+        else return;
       }
-      playVideoAtIndex(nextIdx);
+      playVideoAtIndex(nextIdx, true);
     }
 
     function prevArtwork() {
       if (state.videos.length === 0) return;
       let prevIdx = state.currentIndex - 1;
-      if (prevIdx < 0) {
-        prevIdx = state.videos.length - 1;
-      }
-      playVideoAtIndex(prevIdx);
+      if (prevIdx < 0) prevIdx = state.videos.length - 1;
+      playVideoAtIndex(prevIdx, true);
     }
 
-    /* Video Playback Speed Toggle */
     function togglePlaybackSpeed() {
       const speeds = [1.0, 1.25, 1.5, 2.0, 0.75];
       const nextIdx = (speeds.indexOf(state.speed) + 1) % speeds.length;
@@ -1322,37 +1386,30 @@
         `;
       }).join('');
 
-      // Attach click events
       document.querySelectorAll('.video-card').forEach(card => {
         card.addEventListener('click', () => {
           const idx = parseInt(card.getAttribute('data-index'), 10);
-          playVideoAtIndex(idx);
+          playVideoAtIndex(idx, true);
         });
       });
     }
 
-    /* KIOSK / FULLSCREEN MODE LOGIC */
+    /* KIOSK / FULLSCREEN MODE */
     function enterKioskMode() {
       state.isKiosk = true;
       const overlay = document.getElementById('kioskOverlay');
       overlay.classList.remove('hidden');
 
-      // Sync Kiosk Video
       kioskVideo.src = mainVideo.src;
       kioskVideo.currentTime = mainVideo.currentTime;
       kioskVideo.muted = state.isMuted;
       kioskVideo.volume = state.volume;
       kioskVideo.playbackRate = state.speed;
 
-      if (!mainVideo.paused) {
-        kioskVideo.play();
-      }
+      if (!mainVideo.paused) kioskVideo.play();
 
-      // Try browser fullscreen
       const el = document.documentElement;
-      if (el.requestFullscreen) {
-        el.requestFullscreen().catch(() => {});
-      }
+      if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
 
       startKioskIdleTracker();
       updateClock();
@@ -1364,9 +1421,7 @@
       const overlay = document.getElementById('kioskOverlay');
       overlay.classList.add('hidden');
       mainVideo.currentTime = kioskVideo.currentTime;
-      if (!kioskVideo.paused) {
-        mainVideo.play();
-      }
+      if (!kioskVideo.paused) mainVideo.play();
       kioskVideo.pause();
 
       if (document.fullscreenElement && document.exitFullscreen) {
@@ -1399,12 +1454,94 @@
       const str = now.toTimeString().split(' ')[0];
       const clockEl = document.getElementById('kioskClock');
       if (clockEl) clockEl.textContent = str;
-      if (state.isKiosk) {
-        setTimeout(updateClock, 1000);
+      if (state.isKiosk) setTimeout(updateClock, 1000);
+    }
+
+    /* QR CODE GENERATOR & 100% RELIABLE SCAN ENGINE */
+    function renderQrCode(url) {
+      const container = document.getElementById('qrcodeCanvasContainer');
+      const inputEl = document.getElementById('qrTargetUrlInput');
+      const targetUrl = url || (inputEl ? inputEl.value.trim() : '') || state.settings.qrUrl || window.location.href;
+
+      // Update 404 Status Warning Badge
+      const badge = document.getElementById('qrStatusBadge');
+      if (badge) {
+        if (targetUrl.includes('your-username') || targetUrl.includes('about:') || !targetUrl.startsWith('http')) {
+          badge.className = 'px-2 py-0.5 rounded text-[10px] font-semibold bg-red-950 text-red-300 border border-red-800';
+          badge.textContent = '⚠️ 예시 주소(404 원인)';
+        } else {
+          badge.className = 'px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800';
+          badge.textContent = '✅ 실제 접속 주소 연동됨';
+        }
+      }
+
+      const testLink = document.getElementById('btnTestQrUrl');
+      if (testLink) testLink.href = targetUrl;
+
+      // 1. Try QRCode.js if loaded from CDN
+      if (typeof QRCode !== 'undefined') {
+        container.innerHTML = '';
+        try {
+          new QRCode(container, {
+            text: targetUrl,
+            width: 128,
+            height: 128,
+            colorDark: "#111827",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+          });
+          return;
+        } catch (e) {
+          console.warn('QRCode.js rendering error, using fallback:', e);
+        }
+      }
+
+      // 2. High-reliability standard QR Image API Fallback (Guaranteed scannable on all phones)
+      container.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(targetUrl)}" alt="Exhibition QR Code" class="w-32 h-32 object-contain rounded" crossorigin="anonymous">`;
+    }
+
+    function downloadQrImage() {
+      const container = document.getElementById('qrcodeCanvasContainer');
+      const canvas = container.querySelector('canvas');
+      const img = container.querySelector('img');
+
+      if (canvas) {
+        const a = document.createElement('a');
+        a.href = canvas.toDataURL('image/png');
+        a.download = 'exhibition-qr-code.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast('QR 코드 이미지(PNG)가 다운로드되었습니다!', '📥');
+      } else if (img && img.src) {
+        // Draw to temp canvas for cross-browser download
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = 180;
+        tempCanvas.height = 180;
+        const ctx = tempCanvas.getContext('2d');
+        const tempImg = new Image();
+        tempImg.crossOrigin = 'anonymous';
+        tempImg.onload = () => {
+          ctx.drawImage(tempImg, 0, 0, 180, 180);
+          const a = document.createElement('a');
+          a.href = tempCanvas.toDataURL('image/png');
+          a.download = 'exhibition-qr-code.png';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          showToast('QR 코드 이미지(PNG)가 다운로드되었습니다!', '📥');
+        };
+        tempImg.onerror = () => {
+          window.open(img.src, '_blank');
+          showToast('QR 코드 이미지를 새 탭에 열었습니다.', '📥');
+        };
+        tempImg.src = img.src;
+      } else {
+        showToast('QR 코드 이미지를 생성할 수 없습니다.', '⚠️');
       }
     }
 
-    /* UPDATE JSON EXPORTER TEXT */
+    /* JSON EXPORTER */
     function updateJsonExporter() {
       const clean = state.videos.map(v => ({
         id: v.id,
@@ -1426,7 +1563,7 @@
       if (el) el.value = jsonStr;
     }
 
-    /* GITHUB API SYNC LOGIC (The core requested feature!) */
+    /* GITHUB API SYNC */
     async function syncGitHubVideos() {
       const repo = state.settings.ghRepo.trim() || document.getElementById('ghRepoInput').value.trim();
       const branch = state.settings.ghBranch.trim() || 'main';
@@ -1447,7 +1584,6 @@
       showToast(`${repo} 저장소의 영상을 조회하는 중입니다...`, '🔄');
 
       try {
-        // Step 1: Check if videos.json exists in root
         let jsonLoaded = false;
         try {
           const jsonRes = await fetch(`https://raw.githubusercontent.com/${repo}/${branch}/videos.json?cache_bust=${Date.now()}`);
@@ -1463,7 +1599,6 @@
           console.log('videos.json not found, falling back to /videos folder scan');
         }
 
-        // Step 2: If no videos.json, scan the /videos folder via GitHub API
         if (!jsonLoaded) {
           const apiRes = await fetch(`https://api.github.com/repos/${repo}/contents/videos?ref=${branch}`);
           if (apiRes.ok) {
@@ -1472,7 +1607,6 @@
 
             if (videoFiles.length > 0) {
               const newVideos = videoFiles.map((f, idx) => {
-                // Parse filename e.g. "김서연_공명.mp4" or "01_Resonance_Kim.mp4"
                 const cleanName = f.name.replace(/\.[^/.]+$/, '');
                 const parts = cleanName.split(/[_\-]/);
                 let artist = '참여작가';
@@ -1520,7 +1654,7 @@
       }
     }
 
-    /* Modal Switching Helpers */
+    /* Modal Navigation */
     function openModal(id) {
       document.getElementById(id).classList.remove('hidden');
     }
@@ -1549,7 +1683,7 @@
     window.addEventListener('DOMContentLoaded', () => {
       loadSavedState();
 
-      // Set initial headers from settings
+      // Set initial headers
       document.getElementById('headerExhibitionTitle').textContent = state.settings.title;
       document.getElementById('headerDeptTitle').textContent = state.settings.dept;
       document.getElementById('kioskExhibitionTitle').textContent = state.settings.title;
@@ -1563,11 +1697,12 @@
         document.getElementById('ghRepoInput').value = state.settings.ghRepo;
       }
 
-      // Initial Render
+      // Initial Render & QR
       renderCardsGrid();
       playVideoAtIndex(0, false);
+      renderQrCode(state.settings.qrUrl || window.location.href);
 
-      // Video event listeners
+      // Video timeline update
       mainVideo.addEventListener('timeupdate', () => {
         const cur = mainVideo.currentTime;
         const dur = mainVideo.duration;
@@ -1627,7 +1762,6 @@
 
       // Next / Prev triggers
       btnNextVideo.addEventListener('click', nextArtwork);
-      btnTriggerNext.addEventListener('click', nextArtwork);
       document.getElementById('kioskBtnNext').addEventListener('click', nextArtwork);
       btnPrevVideo.addEventListener('click', prevArtwork);
       document.getElementById('kioskBtnPrev').addEventListener('click', prevArtwork);
@@ -1656,28 +1790,83 @@
         document.getElementById('unmuteBanner').classList.add('hidden');
       });
 
-      // Search & Category Filters
+      // Search & Quick triggers
       document.getElementById('searchInput').addEventListener('input', (e) => {
         state.searchQuery = e.target.value;
         renderCardsGrid();
       });
 
-      document.querySelectorAll('.cat-pill').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.cat-pill').forEach(b => {
-            b.classList.remove('bg-accent-500', 'text-white');
-            b.classList.add('text-gallery-300');
-          });
-          btn.classList.remove('text-gallery-300');
-          btn.classList.add('bg-accent-500', 'text-white');
-          state.filterCategory = btn.getAttribute('data-cat');
-          renderCardsGrid();
-        });
+      document.getElementById('btnQuickAddTrigger').addEventListener('click', () => {
+        openModal('uploadModal');
+        switchModalTab('tab-local');
       });
 
-      // Quick Sync Button in Header
-      document.getElementById('btnQuickSync').addEventListener('click', syncGitHubVideos);
-      document.getElementById('btnFetchGitHubVideos').addEventListener('click', syncGitHubVideos);
+      // QR Code Modal Openers & Actions
+      function updateCalculatedQrUrl() {
+        const user = document.getElementById('qrGhUser').value.trim();
+        const repo = document.getElementById('qrGhRepo').value.trim() || 'grad-exhibition-2026';
+        
+        let url = '';
+        if (user) {
+          url = `https://${user}.github.io/${repo}/`;
+        } else {
+          url = `https://your-username.github.io/${repo}/`;
+        }
+        
+        document.getElementById('qrTargetUrlInput').value = url;
+        state.settings.qrUrl = url;
+        if (user) {
+          state.settings.ghRepo = `${user}/${repo}`;
+        }
+        persistState();
+        renderQrCode(url);
+      }
+
+      const openQrHandler = () => {
+        openModal('qrModal');
+        // Auto-detect GitHub username if hosted on GitHub Pages
+        if (window.location.hostname.endsWith('github.io')) {
+          const user = window.location.hostname.split('.')[0];
+          const parts = window.location.pathname.split('/').filter(Boolean);
+          const repo = parts[0] || 'grad-exhibition-2026';
+          document.getElementById('qrGhUser').value = user;
+          document.getElementById('qrGhRepo').value = repo;
+          const liveUrl = window.location.href.split('?')[0].split('#')[0];
+          document.getElementById('qrTargetUrlInput').value = liveUrl;
+          renderQrCode(liveUrl);
+        } else {
+          renderQrCode(document.getElementById('qrTargetUrlInput').value);
+        }
+      };
+
+      document.getElementById('btnOpenQrModal').addEventListener('click', openQrHandler);
+      document.getElementById('btnOpenQrFromPlacard').addEventListener('click', openQrHandler);
+      document.getElementById('btnBannerOpenQr').addEventListener('click', openQrHandler);
+      document.getElementById('btnCloseQrModal').addEventListener('click', () => closeModal('qrModal'));
+
+      document.getElementById('qrGhUser').addEventListener('input', updateCalculatedQrUrl);
+      document.getElementById('qrGhRepo').addEventListener('input', updateCalculatedQrUrl);
+
+      document.getElementById('btnRegenerateQr').addEventListener('click', () => {
+        const url = document.getElementById('qrTargetUrlInput').value.trim();
+        state.settings.qrUrl = url;
+        persistState();
+        renderQrCode(url);
+        showToast('새 URL로 QR 코드가 갱신되었습니다.', '📱');
+      });
+
+      // 404 Guide Toggle
+      document.getElementById('btnToggle404Guide').addEventListener('click', () => {
+        const contentEl = document.getElementById('content404Guide');
+        const arrow = document.getElementById('arrow404Guide');
+        contentEl.classList.toggle('hidden');
+        arrow.classList.toggle('rotate-180');
+      });
+
+      document.getElementById('btnDownloadQrImage').addEventListener('click', downloadQrImage);
+      document.getElementById('btnPrintPlacard').addEventListener('click', () => {
+        window.print();
+      });
 
       // Share Artwork Link
       document.getElementById('btnShareArtwork').addEventListener('click', () => {
@@ -1707,22 +1896,25 @@
         openModal('uploadModal');
         updateJsonExporter();
       });
+      document.getElementById('btnBannerOpenCms').addEventListener('click', () => {
+        openModal('uploadModal');
+        updateJsonExporter();
+      });
       document.getElementById('btnCloseUploadModal').addEventListener('click', () => closeModal('uploadModal'));
 
       document.getElementById('btnOpenSettings').addEventListener('click', () => openModal('settingsModal'));
       document.getElementById('btnCloseSettings').addEventListener('click', () => closeModal('settingsModal'));
 
-      document.getElementById('btnViewFullGuide').addEventListener('click', () => openModal('guideModal'));
-      document.getElementById('btnCloseGuideModal').addEventListener('click', () => closeModal('guideModal'));
+      // Quick Sync
+      document.getElementById('btnQuickSync').addEventListener('click', syncGitHubVideos);
+      document.getElementById('btnFetchGitHubVideos').addEventListener('click', syncGitHubVideos);
 
-      // Tab switcher inside Upload Modal
+      // Modal Tab Switcher
       document.querySelectorAll('.modal-tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          switchModalTab(btn.getAttribute('data-tab'));
-        });
+        btn.addEventListener('click', () => switchModalTab(btn.getAttribute('data-tab')));
       });
 
-      // Drop Zone & Local File Upload (Immediate playback)
+      // Drop Zone & Local File Upload
       const dropZone = document.getElementById('dropZone');
       const fileInput = document.getElementById('localFileInput');
 
@@ -1747,26 +1939,45 @@
         }
       });
 
+      // Video Stage Standby Button file pickers
+      document.getElementById('btnStagePlayFile').addEventListener('click', () => fileInput.click());
+      document.getElementById('btnStageOpenAddModal').addEventListener('click', () => {
+        openModal('uploadModal');
+        switchModalTab('tab-local');
+      });
+
+      // Drag and drop directly onto the videoContainer
+      const videoContainer = document.getElementById('videoContainer');
+      videoContainer.addEventListener('dragover', (e) => {
+        e.preventDefault();
+      });
+      videoContainer.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+          handleLocalVideoFiles(e.dataTransfer.files);
+        }
+      });
+
       function handleLocalVideoFiles(files) {
-        const artist = document.getElementById('localArtistInput').value.trim() || '현장등록 작가';
-        const category = document.getElementById('localCategorySelect').value || '미디어아트';
+        const customTitle = document.getElementById('localTitleInput').value.trim();
+        const artist = document.getElementById('localArtistInput').value.trim() || '출품 작가';
 
         Array.from(files).forEach((file, i) => {
           if (!file.type.startsWith('video/')) return;
           const blobUrl = URL.createObjectURL(file);
-          const cleanName = file.name.replace(/\.[^/.]+$/, '');
+          const cleanName = customTitle || file.name.replace(/\.[^/.]+$/, '');
 
           const newWork = {
             id: `local-${Date.now()}-${i}`,
             title: cleanName,
             artist: artist,
-            major: '현장 시연 등록',
+            major: '미디어아트 / 디지털영상',
             year: '2026',
-            category: category,
+            category: '미디어아트',
             runtime: '로컬 재생',
             spec: `${(file.size / (1024 * 1024)).toFixed(1)}MB Video`,
             medium: 'Local High-Bitrate Source',
-            statement: `브라우저 로컬 파일 시스템에서 직접 불러온 ${file.name} 영상입니다.`,
+            statement: `브라우저에서 직접 불러온 ${file.name} 영상입니다.`,
             thumbnail: state.videos[0] ? state.videos[0].thumbnail : '',
             src: blobUrl,
             type: file.type
@@ -1775,10 +1986,11 @@
           state.videos.unshift(newWork);
         });
 
+        persistState();
         renderCardsGrid();
         playVideoAtIndex(0, true);
         closeModal('uploadModal');
-        showToast('로컬 영상이 등록되어 즉시 재생을 시작합니다!', '🎬');
+        showToast('영상 파일이 등록되어 즉시 상영을 시작합니다!', '🎬');
       }
 
       // Add Video by URL
@@ -1787,7 +1999,7 @@
         const title = document.getElementById('inputUrlTitle').value.trim();
         const artist = document.getElementById('inputUrlArtist').value.trim();
         const category = document.getElementById('inputUrlCategory').value;
-        const runtime = document.getElementById('inputUrlRuntime').value.trim() || '03:00';
+        const runtime = document.getElementById('inputUrlRuntime').value.trim() || '00:59';
         const statement = document.getElementById('inputUrlStatement').value.trim() || '출품작 설명입니다.';
 
         if (!url || !title || !artist) {
@@ -1799,7 +2011,7 @@
           id: `web-${Date.now()}`,
           title: title,
           artist: artist,
-          major: '졸업전시출품작',
+          major: '미디어아트 / 디지털영상',
           year: '2026',
           category: category,
           runtime: runtime,
@@ -1858,11 +2070,6 @@
       };
 
       document.getElementById('btnCopyJsonModal').addEventListener('click', copyJson);
-      document.getElementById('btnCopyJsonTemplate').addEventListener('click', () => {
-        updateJsonExporter();
-        copyJson();
-      });
-
       document.getElementById('btnDownloadJson').addEventListener('click', () => {
         const text = document.getElementById('jsonOutputText').value;
         const blob = new Blob([text], { type: 'application/json' });
@@ -1877,7 +2084,6 @@
 
       // Global Keyboard Shortcuts
       window.addEventListener('keydown', (e) => {
-        // Ignore if typing in an input
         if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
 
         if (e.code === 'Space') {
@@ -1891,7 +2097,7 @@
           if (state.isKiosk) exitKioskMode();
           closeModal('uploadModal');
           closeModal('settingsModal');
-          closeModal('guideModal');
+          closeModal('qrModal');
         } else if (e.key === 'm' || e.key === 'M') {
           toggleMute();
         } else if (e.key === 'l' || e.key === 'L') {
