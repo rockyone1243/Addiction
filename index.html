@@ -133,16 +133,7 @@
     </div>
   </header>
 
-  <!-- ================= UNMUTE NOTIFICATION BANNER ================= -->
-  <div id="unmuteBanner" class="bg-gradient-to-r from-accent-500/15 via-indigo-500/15 to-accent-500/15 border-b border-accent-500/20 px-4 py-2 text-center text-xs text-accent-300 flex items-center justify-center space-x-3">
-    <span>🔊 브라우저 자동재생 보안 정책에 따라 소리를 켜시려면 버튼을 눌러주세요.</span>
-    <button id="btnUnmuteAudio" class="px-3 py-1 rounded bg-accent-500 hover:bg-accent-400 text-white text-xs font-medium transition shadow-sm">
-      사운드 켜기
-    </button>
-    <button id="btnDismissUnmute" class="text-gallery-400 hover:text-white text-xs underline ml-2">
-      닫기
-    </button>
-  </div>
+
 
   <!-- ================= MAIN CONTAINER ================= -->
   <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8 space-y-10">
@@ -519,6 +510,13 @@
 
   <!-- ================= CORE JAVASCRIPT ================= -->
   <script>
+    // GitHub Pages relative path resolution: ensure trailing slash on directory URL
+    if (window.location.hostname.endsWith('github.io')) {
+      if (window.location.pathname.endsWith('/Overdose') && !window.location.pathname.endsWith('/Overdose/')) {
+        window.location.replace(window.location.pathname + '/' + window.location.search + window.location.hash);
+      }
+    }
+
     /* State */
     const state = {
       isPlaying: false,
@@ -782,40 +780,92 @@
       checkAdminAccess();
       renderQrCode();
 
-      // Assign Video Source & Configure Continuous Seamless Loop
-      const VIDEO_SRC = 'videos/Overdose.mp4';
-      mainVideo.src = VIDEO_SRC;
-      kioskVideo.src = VIDEO_SRC;
+      // Smart Multi-Path Candidate Resolution
+      // Supports root directory ('Overdose.mp4') where file is currently uploaded on GitHub,
+      // as well as 'videos/Overdose.mp4' and explicit relative paths!
+      const candidatePaths = [
+        'Overdose.mp4',
+        './Overdose.mp4',
+        'videos/Overdose.mp4',
+        './videos/Overdose.mp4'
+      ];
+      let candidateIndex = 0;
 
-      mainVideo.muted = true;
-      mainVideo.defaultMuted = true;
-      mainVideo.playsInline = true;
-      mainVideo.loop = true;
+      const loadVideoCandidate = (videoEl, index) => {
+        if (index >= candidatePaths.length) {
+          console.error('All video candidate paths failed.');
+          return;
+        }
+        const srcPath = candidatePaths[index];
+        videoEl.src = srcPath;
+        videoEl.playsInline = true;
+        videoEl.loop = true;
 
-      kioskVideo.muted = true;
-      kioskVideo.defaultMuted = true;
-      kioskVideo.playsInline = true;
-      kioskVideo.loop = true;
+        // Attempt direct unmuted audio playback first
+        videoEl.muted = false;
+        state.isMuted = false;
+        updateVolumeUI();
 
-      // Force Instant Seamless Autoplay on Load without clicking
-      const startContinuousPlayback = () => {
-        const playPromise = mainVideo.play();
-        if (playPromise !== undefined) {
-          playPromise.then(() => {
+        const p = videoEl.play();
+        if (p !== undefined) {
+          p.then(() => {
             state.isPlaying = true;
+            state.isMuted = false;
             updatePlayButtonUI();
+            updateVolumeUI();
           }).catch((err) => {
-            console.warn('Initial autoplay requires muted state:', err);
-            mainVideo.muted = true;
-            mainVideo.play().then(() => {
+            // If browser blocks initial audio before user interaction, play muted first so video rolls immediately
+            videoEl.muted = true;
+            state.isMuted = true;
+            updateVolumeUI();
+            videoEl.play().then(() => {
               state.isPlaying = true;
               updatePlayButtonUI();
             }).catch(() => {});
+
+            // Seamless Auto-Unmute on ANY user touch, scroll, click, or mouse movement (Zero buttons needed!)
+            const unlockAudioSilently = () => {
+              if (mainVideo.muted) {
+                mainVideo.muted = false;
+                state.isMuted = false;
+                updateVolumeUI();
+              }
+              if (kioskVideo.muted) {
+                kioskVideo.muted = false;
+              }
+              ['click', 'touchstart', 'touchend', 'scroll', 'keydown', 'mousemove'].forEach(evt => {
+                window.removeEventListener(evt, unlockAudioSilently, true);
+              });
+            };
+            ['click', 'touchstart', 'touchend', 'scroll', 'keydown', 'mousemove'].forEach(evt => {
+              window.addEventListener(evt, unlockAudioSilently, { once: true, capture: true, passive: true });
+            });
           });
         }
       };
 
-      startContinuousPlayback();
+      mainVideo.addEventListener('error', () => {
+        candidateIndex++;
+        if (candidateIndex < candidatePaths.length) {
+          console.warn(`Fallback: trying next video path candidate: ${candidatePaths[candidateIndex]}`);
+          loadVideoCandidate(mainVideo, candidateIndex);
+        }
+      });
+
+      kioskVideo.addEventListener('error', () => {
+        if (candidateIndex < candidatePaths.length) {
+          kioskVideo.src = candidatePaths[candidateIndex];
+          kioskVideo.play().catch(() => {});
+        }
+      });
+
+      // Start initial playback with first candidate ('Overdose.mp4' in root)
+      loadVideoCandidate(mainVideo, 0);
+      kioskVideo.src = candidatePaths[0];
+      kioskVideo.muted = true;
+      kioskVideo.defaultMuted = true;
+      kioskVideo.playsInline = true;
+      kioskVideo.loop = true;
 
       // Seamless Gapless Loop Engine (Eliminates stutter/black blink between loops)
       mainVideo.addEventListener('timeupdate', () => {
@@ -889,18 +939,7 @@
       btnFullscreenToggle.addEventListener('click', enterKioskMode);
       document.getElementById('btnExitKiosk').addEventListener('click', exitKioskMode);
 
-      // Unmute Banner
-      document.getElementById('btnUnmuteAudio').addEventListener('click', () => {
-        state.isMuted = false;
-        mainVideo.muted = false;
-        kioskVideo.muted = false;
-        updateVolumeUI();
-        document.getElementById('unmuteBanner').classList.add('hidden');
-        showToast('전시 사운드가 켜졌습니다.', '🔊');
-      });
-      document.getElementById('btnDismissUnmute').addEventListener('click', () => {
-        document.getElementById('unmuteBanner').classList.add('hidden');
-      });
+
 
       // QR Modal
       document.getElementById('btnOpenQrModal').addEventListener('click', () => {
